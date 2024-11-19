@@ -47,6 +47,5 @@ public class SubTask extends Task {
     public int hashCode() {
         return Objects.hashCode(epicId);
     }
-
 }
 

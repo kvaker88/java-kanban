@@ -81,7 +81,6 @@ public class Main {
         System.out.println(TasksManager.getEpics());
         System.out.println(TasksManager.getSubtasks());
         System.out.println("-".repeat(120));
-
     }
 }
 

@@ -31,5 +31,4 @@ public class Epic extends Task {
     public int hashCode() {
         return Objects.hash(super.hashCode(), subTasks);
     }
-
 }
