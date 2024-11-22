@@ -22,6 +22,8 @@ public class Epic extends Task {
         subtasks.add(subTask);
     }
 
+    // метод необходим, для работы метода updateEpic,
+    // чтобы сохранить содержимое листа subtasks, когда как Епик перезаписывается.
     public void addSubTasks(List<SubTask> subtasks) {
         for (SubTask subTask : subtasks) {
             this.subtasks.add(subTask);
@@ -35,6 +37,10 @@ public class Epic extends Task {
                 break;
             }
         }
+    }
+
+    public void removeAllSubTask() {
+        subtasks.clear();
     }
 
     public List<SubTask> getSubtasks() {

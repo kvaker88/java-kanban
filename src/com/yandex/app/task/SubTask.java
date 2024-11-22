@@ -11,11 +11,8 @@ public class SubTask extends Task {
     }
 
     // конструктор для внесения изменений в уже существующую подзадачу
-    public SubTask(int id, String name, String description, Status stat) {
+    public SubTask(int id, int epicId, String name, String description, Status stat) {
         super(id, name, description, stat);
-    }
-
-    public void setEpicId(int epicId) { // метод для получения ID эпика подзадачи
         this.epicId = epicId;
     }
 

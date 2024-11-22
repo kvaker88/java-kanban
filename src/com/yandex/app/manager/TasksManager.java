@@ -17,10 +17,6 @@ public class TasksManager {
     private int id = 1; // счётчик ID задач
 
     public int addNewTask(Task task) {
-        // Проверяем, существует ли уже задача с данным ID
-        if (tasks.containsKey(task.getId())) {
-            return -1; // Возвращаем -1, если ID не уникален
-        }
         task.setId(id);
         tasks.put(id++, task); // Добавляем задачу в Map
         return task.getId(); // Возвращаем ID добавленной задачи
@@ -28,19 +24,12 @@ public class TasksManager {
 
 
     public int addNewEpic(Epic epic) { // метод для добавления эпика
-        // Проверяем, существует ли уже задача с данным ID
-        if (epics.containsKey(epic.getId())) {
-            return -1; // Возвращаем -1, если ID не уникален
-        }
         epic.setId(id);
         epics.put(id++, epic); // Добавляем задачу в Map
         return epic.getId(); // Возвращаем ID добавленной задачи
     }
 
     public int addNewSubtask(int epicId, SubTask subTask) { // метод для добавления подзадачи
-        if (subtasks.containsKey(subTask.getId())) { // Проверяем, существует ли уже задача с данным ID
-            return -1; // Возвращаем -1, если ID не уникален
-        }
         if (!epics.containsKey(epicId)) { // Проверяем, существует ли Эпик
             System.out.println("Эписка с указанным ID нет.");
             return -1;
@@ -48,34 +37,20 @@ public class TasksManager {
         subTask.setId(id++);
         getEpic(epicId).addSubTask(subTask);
         subtasks.put(subTask.getId(), subTask); // Добавляем задачу в Map
+        updateEpicStatus(getEpic(epicId));
         return subTask.getId(); // Возвращаем ID добавленной задачи
     }
 
     public List<Task> getTasks() {
-        if (tasks.isEmpty()) {
-            System.out.println("Список задач пуст.");
-            return Collections.emptyList();
-        } else {
-            return new ArrayList<>(tasks.values());
-        }
+        return new ArrayList<>(tasks.values());
     }
 
     public List<SubTask> getSubtasks() { // метод для получения подзадач
-        if (subtasks.isEmpty()) {
-            System.out.println("Список подзадач пуст.");
-            return Collections.emptyList();
-        } else {
-            return new ArrayList<>(subtasks.values());
-        }
+        return new ArrayList<>(subtasks.values());
     }
 
     public List<Epic> getEpics() { // метод для получения эпиков
-        if (epics.isEmpty()) {
-            System.out.println("Список Эпиков пуст.");
-            return Collections.emptyList();
-        } else {
-            return new ArrayList<>(epics.values());
-        }
+        return new ArrayList<>(epics.values());
     }
 
     public List<SubTask> getEpicSubtasks(int epicId) {
@@ -86,16 +61,6 @@ public class TasksManager {
             List<SubTask> subtasksForEpic = epic.getSubtasks();
             return subtasksForEpic; // Возвращаем список подзадач
         }
-    }
-
-    public Epic getEpicById(int id) {
-
-        for (Epic epic : epics.values()) {
-                if (epic.getId() == id) { // Для id можно использовать ==, если это int
-                    return epic;
-            }
-        }
-        return null;
     }
 
     public Epic getEpic(int id) { // метод для получения информации по отдельному Эпику по ID
@@ -139,8 +104,7 @@ public class TasksManager {
         if (epics.containsKey(epic.getId())) {
             Epic oldEpic = epics.get(epic.getId());
             epic.addSubTasks(oldEpic.getSubtasks());
-            epic.setStatus(oldEpic.getStatus());
-
+            updateEpicStatus(epic);
             epics.put(epic.getId(), epic);
         } else {
             System.out.println("Эпика с таким ID нет в списке.");
@@ -150,10 +114,9 @@ public class TasksManager {
     // метод для обновления информации в подзадаче по ID
     public void updateSubtask(SubTask subTask) { // метод для обновления информации подзадач
         if (subtasks.containsKey(subTask.getId())) {
-            Epic epic = getEpicById(subtasks
+            Epic epic = getEpic(subtasks
                     .get(subTask.getId())
                     .getEpicId());
-            subTask.setEpicId(epic.getId());
             epic.removeSubTask(subTask.getId());
             epic.addSubTask(subTask);
 
@@ -189,9 +152,9 @@ public class TasksManager {
     public void deleteSubtask(int id) { // метод для удаления подзадачи по ID
         if (subtasks.containsKey(id)) {
             SubTask subTask = subtasks.get(id);
-            Epic epic = getEpicById(subTask.getEpicId());
-            updateEpicStatus(epic);
+            Epic epic = getEpic(subTask.getEpicId());
             epic.removeSubTask(subTask.getId());
+            updateEpicStatus(epic);
             subtasks.remove(id);
             System.out.println("Подзадача с ID - " + id + ", удалена.");
         } else {
@@ -208,6 +171,7 @@ public class TasksManager {
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.setStatus(Status.NEW);
+            epic.removeAllSubTask();
         }
         System.out.println("Все подзадачи удалены!");
     }
