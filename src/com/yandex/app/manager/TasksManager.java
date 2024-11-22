@@ -103,9 +103,8 @@ public class TasksManager {
     public void updateEpic(Epic epic) { // метод для обновления информации Эпиков
         if (epics.containsKey(epic.getId())) {
             Epic oldEpic = epics.get(epic.getId());
-            epic.addSubTasks(oldEpic.getSubtasks());
-            updateEpicStatus(epic);
-            epics.put(epic.getId(), epic);
+            oldEpic.setDescription(epic.getDescription());
+            oldEpic.setName(epic.getName());
         } else {
             System.out.println("Эпика с таким ID нет в списке.");
         }
