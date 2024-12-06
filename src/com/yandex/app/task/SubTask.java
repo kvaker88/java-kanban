@@ -1,6 +1,6 @@
 package com.yandex.app.task;
 
-// класс для выполнения действий с подзадачами
+    // класс для выполнения действий с подзадачами
 public class SubTask extends Task {
     private int epicId; // у каждой подзадачи есть свой эпик, к которому он привязан
 
