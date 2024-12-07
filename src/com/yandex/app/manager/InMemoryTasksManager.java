@@ -64,8 +64,7 @@ public class InMemoryTasksManager implements TasksManager {
         if (epic == null) {
             return new ArrayList<>(); // Эпик не найден, возвращаем пустой список
         } else {
-            List<SubTask> subtasksForEpic = epic.getSubtasks();
-            return subtasksForEpic; // Возвращаем список подзадач
+            return epic.getSubtasks(); // Возвращаем список подзадач
         }
     }
 
@@ -230,10 +229,10 @@ public class InMemoryTasksManager implements TasksManager {
         }
     }
 
+    @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
-
 }
 
 
