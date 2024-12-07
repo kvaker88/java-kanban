@@ -8,7 +8,7 @@ import java.util.*;
 // класс с менеджером задач для взаимодействия с задачами разных типов
 public class InMemoryTasksManager implements TasksManager {
 
-    private InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private final Map<Integer, Task> tasks = new HashMap<>(); // Обычные задачи
     private final Map<Integer, Epic> epics = new HashMap<>(); // Эпики
@@ -21,10 +21,6 @@ public class InMemoryTasksManager implements TasksManager {
         task.setId(id);
         tasks.put(id++, task); // Добавляем задачу в Map
         return task.getId(); // Возвращаем ID добавленной задачи
-    }
-
-    public void sout() {
-        System.out.println(subtasks);
     }
 
     @Override
@@ -41,9 +37,9 @@ public class InMemoryTasksManager implements TasksManager {
             return -1;
         }
         subTask.setId(id++);
-        getEpicWithoutHistory(epicId).addSubTask(subTask);
+        epics.get(epicId).addSubTask(subTask);
         subtasks.put(subTask.getId(), subTask); // Добавляем задачу в Map
-        updateEpicStatus(getEpicWithoutHistory(epicId));
+        updateEpicStatus(epics.get(epicId));
         return subTask.getId(); // Возвращаем ID добавленной задачи
     }
 
@@ -64,7 +60,7 @@ public class InMemoryTasksManager implements TasksManager {
 
     @Override
     public List<SubTask> getEpicSubtasks(int epicId) {
-        Epic epic = getEpicWithoutHistory(epicId); // Получаем эпик по ID
+        Epic epic = epics.get(epicId); // Получаем эпик по ID
         if (epic == null) {
             return new ArrayList<>(); // Эпик не найден, возвращаем пустой список
         } else {
@@ -73,17 +69,8 @@ public class InMemoryTasksManager implements TasksManager {
         }
     }
 
-    public Epic getEpicWithoutHistory(int id) { // метод для работы других методов, без записи в историю
-        if (epics.containsKey(id)) {
-            return epics.get(id);
-        } else {
-            System.out.println("Эпика с указанным ID нет в списке.");
-            return null;
-        }
-    }
-
     @Override
-    public Epic getEpic(int id) { // метод для получения информации по отдельному Эпику по ID с записью в историю
+    public Epic getEpic(int id) { // метод для получения информации по отдельному Эпику по ID
         if (epics.containsKey(id)) {
             historyManager.addHistory(epics.get(id));
             return epics.get(id);
@@ -141,7 +128,7 @@ public class InMemoryTasksManager implements TasksManager {
     @Override
     public void updateSubtask(SubTask subTask) { // метод для обновления информации подзадач
         if (subtasks.containsKey(subTask.getId())) {
-            Epic epic = getEpicWithoutHistory(subtasks
+            Epic epic = epics.get(subtasks
                     .get(subTask.getId())
                     .getEpicId());
             epic.removeSubTask(subTask.getId());
@@ -180,7 +167,7 @@ public class InMemoryTasksManager implements TasksManager {
     public void deleteSubtask(int id) { // метод для удаления подзадачи по ID
         if (subtasks.containsKey(id)) {
             SubTask subTask = subtasks.get(id);
-            Epic epic = getEpicWithoutHistory(subTask.getEpicId());
+            Epic epic = epics.get(subTask.getEpicId());
             epic.removeSubTask(subTask.getId());
             updateEpicStatus(epic);
             subtasks.remove(id);
@@ -210,8 +197,7 @@ public class InMemoryTasksManager implements TasksManager {
     }
 
     // метод для проверки и изменения статуса Эпика при изменении статуса подзадач или их удалении
-    @Override
-    public void updateEpicStatus(Epic epic) {
+    private void updateEpicStatus(Epic epic) {
         List<SubTask> epicSubTasks = getEpicSubtasks(epic.getId());
         if (epicSubTasks.isEmpty()) {
             epic.setStatus(Status.NEW);
@@ -243,6 +229,11 @@ public class InMemoryTasksManager implements TasksManager {
             epic.setStatus(Status.IN_PROGRESS);
         }
     }
+
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
 }
 
 

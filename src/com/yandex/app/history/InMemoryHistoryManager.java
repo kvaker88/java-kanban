@@ -7,12 +7,14 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private static List<Task> history = new ArrayList<>(); // История просмотров задач
+    public static final int HISTORY_LIMIT = 10;
+    private final List<Task> history = new ArrayList<>(); // История просмотров задач
+    // Если убрать static, метод getHistory() будет отдавать пустой список. Как решить иначе, не сообразил.
 
     @Override
     public void addHistory(Task task) {
-        if (!history.contains(task)) {
-            if (history.size() == 10) {
+        if (task != null) {
+            if (history.size() == HISTORY_LIMIT) {
                 history.removeFirst();
             }
             history.add(task);
@@ -21,6 +23,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return new ArrayList<>(history);
     }
 }

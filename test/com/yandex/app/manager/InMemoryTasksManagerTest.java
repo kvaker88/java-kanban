@@ -1,4 +1,5 @@
-import com.yandex.app.manager.InMemoryTasksManager;
+package com.yandex.app.manager;
+
 import com.yandex.app.task.Epic;
 import com.yandex.app.task.Status;
 import com.yandex.app.task.SubTask;
@@ -154,9 +155,9 @@ class InMemoryTasksManagerTest {
     @Test
     void getEpic() {
         Epic epic = new Epic("Test getEpic", "Test getEpic description");
-        tasksManager.addNewEpic(epic);
+        final int epicId = tasksManager.addNewEpic(epic);
 
-        final Epic epicById = tasksManager.getEpic(1);
+        final Epic epicById = tasksManager.getEpic(epicId);
 
         assertNotNull(epicById, "Эпик не возвращается.");
         assertEquals(epic, epicById, "Эпик не совпадает.");
@@ -165,9 +166,9 @@ class InMemoryTasksManagerTest {
     @Test
     void getTask() {
         Task task = new Task("Test getTask", "Test getTask description");
-        tasksManager.addNewTask(task);
+        final int taskId = tasksManager.addNewTask(task);
 
-        final Task taskById = tasksManager.getTask(1);
+        final Task taskById = tasksManager.getTask(taskId);
 
         assertNotNull(taskById, "Задача не возвращаются.");
         assertEquals(task, taskById, "Задача не совпадает.");
@@ -178,8 +179,8 @@ class InMemoryTasksManagerTest {
         tasksManager.addNewEpic(new Epic("Epic for Test getSubtask", "getSubtask description"));
         SubTask subTask = new SubTask(1, "Test getSubtask", "Test getSubtask description");
 
-        tasksManager.addNewSubtask(1, subTask);
-        final SubTask subTaskById = tasksManager.getSubtask(2);
+        final int subTaskId = tasksManager.addNewSubtask(1, subTask);
+        final SubTask subTaskById = tasksManager.getSubtask(subTaskId);
 
         assertNotNull(subTaskById, "Подзадача не возвращаются.");
         assertEquals(subTask, subTaskById, "Подзадача не совпадает.");
@@ -187,47 +188,50 @@ class InMemoryTasksManagerTest {
 
     @Test
     void updateTask() {
-        tasksManager.addNewTask(new Task("Test updateTask", "Test updateTask description"));
+        final int taskId = tasksManager.addNewTask(new Task("Test updateTask",
+                "Test updateTask description"));
         Task updatedTask = new Task(1, "Test#2 updateTask", "Test#2 updateTask description");
 
         tasksManager.updateTask(updatedTask);
 
-        final Task taskById = tasksManager.getTask(1);
+        final Task taskById = tasksManager.getTask(taskId);
         assertEquals(updatedTask, taskById, "Задача не совпадает.");
     }
 
     @Test
     void updateEpic() {
-        tasksManager.addNewEpic(new Epic("Test updateEpic", "updateEpic description"));
+        final int epicId = tasksManager.addNewEpic(new Epic("Test updateEpic",
+                "updateEpic description"));
 
         Epic updatedEpic = new Epic(1, "Test#2 updateEpic", "updateEpic#2 description");
         tasksManager.updateEpic(updatedEpic);
 
-        final Epic epicById = tasksManager.getEpic(1);
+        final Epic epicById = tasksManager.getEpic(epicId);
         assertEquals(updatedEpic, epicById, "Эпик не совпадает.");
     }
 
     @Test
     void updateSubtask() {
         tasksManager.addNewEpic(new Epic("Epic for Test updateSubtask", "updateSubtask description"));
-        tasksManager.addNewSubtask(1, (new SubTask(1, "Test updateSubtask",
+        final int subTaskId = tasksManager.addNewSubtask(1, (new SubTask(1, "Test updateSubtask",
                 "Test updateSubtask description")));
 
         SubTask updatedSubTask = new SubTask(2, 1, "Test#2 updateSubtask",
                 "Test#2 updateSubtask description", Status.IN_PROGRESS);
         tasksManager.updateSubtask(updatedSubTask);
 
-        final SubTask subTaskById = tasksManager.getSubtask(2);
+        final SubTask subTaskById = tasksManager.getSubtask(subTaskId);
         assertEquals(updatedSubTask, subTaskById, "Подзадача не совпадает.");
     }
 
     @Test
     void deleteTask() {
-        tasksManager.addNewTask(new Task("Test#1 deleteTask", "Test#1 deleteTask description"));
+        final int taskId = tasksManager.addNewTask(new Task("Test#1 deleteTask",
+                "Test#1 deleteTask description"));
         Task task2 = new Task("Test#2 deleteTask", "Test#2 deleteTask description");
         tasksManager.addNewTask(task2);
 
-        tasksManager.deleteTask(1);
+        tasksManager.deleteTask(taskId);
         final List<Task> tasks = tasksManager.getTasks();
 
         assertNotNull(tasks, "Задачи не возвращаются.");
@@ -237,11 +241,12 @@ class InMemoryTasksManagerTest {
 
     @Test
     void deleteEpic() {
-        tasksManager.addNewEpic(new Epic("Test#1 deleteEpic", "deleteEpic#1 description"));
+        final int epicId = tasksManager.addNewEpic(new Epic("Test#1 deleteEpic",
+                "deleteEpic#1 description"));
         Epic epic2 = new Epic("Test#2 deleteEpic", "deleteEpic#2 description");
         tasksManager.addNewEpic(epic2);
 
-        tasksManager.deleteEpic(1);
+        tasksManager.deleteEpic(epicId);
         final List<Epic> epics = tasksManager.getEpics();
 
         assertNotNull(epics, "Эпики не возвращаются.");
@@ -252,14 +257,14 @@ class InMemoryTasksManagerTest {
     @Test
     void deleteSubtask() {
         tasksManager.addNewEpic(new Epic("Epic for Test deleteSubtask", "deleteSubtask description"));
-        tasksManager.addNewSubtask(1, (new SubTask(1, "Test#1 updateSubtask",
+        final int subTaskId = tasksManager.addNewSubtask(1, (new SubTask(1, "Test#1 updateSubtask",
                 "Test#1 updateSubtask description")));
 
         SubTask subTask2 = new SubTask(1, "Test#2 deleteSubtask",
                 "Test#2 deleteSubtask description #2");
         tasksManager.addNewSubtask(1, subTask2);
 
-        tasksManager.deleteSubtask(2);
+        tasksManager.deleteSubtask(subTaskId);
         final List<SubTask> subTasks = tasksManager.getSubtasks();
 
         assertNotNull(subTasks, "Эпики не возвращаются.");

@@ -1,4 +1,5 @@
-import com.yandex.app.history.InMemoryHistoryManager;
+package com.yandex.app.history;
+
 import com.yandex.app.manager.InMemoryTasksManager;
 import com.yandex.app.task.Epic;
 import com.yandex.app.task.SubTask;
@@ -12,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class InMemoryHistoryManagerTest {
 
     InMemoryTasksManager tasksManager = new InMemoryTasksManager();
-    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
     @Test
     void addAndGetHistory() {
@@ -39,7 +39,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.addNewSubtask(10, (new SubTask(10, "Test#15 deleteEpics",
                 "deleteEpics#15 description")));
 
-        final List<Task> history1 = historyManager.getHistory();
+        final List<Task> history1 = tasksManager.getHistory();
         assertEquals(0, history1.size());
 
         tasksManager.getTask(2);
@@ -49,7 +49,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(11);
         tasksManager.getSubtask(15);
 
-        final List<Task> history2 = historyManager.getHistory();
+        final List<Task> history2 = tasksManager.getHistory();
         assertEquals(6, history2.size());
 
         tasksManager.getTask(1);
@@ -57,13 +57,13 @@ class InMemoryHistoryManagerTest {
         tasksManager.getEpic(6);
         tasksManager.getEpic(8);
 
-        final List<Task> history3 = historyManager.getHistory();
+        final List<Task> history3 = tasksManager.getHistory();
         assertEquals(10, history3.size());
 
         tasksManager.getSubtask(13);
         tasksManager.getSubtask(14);
 
-        final List<Task> history4 = historyManager.getHistory();
+        final List<Task> history4 = tasksManager.getHistory();
         assertEquals(10, history4.size());
 
         tasksManager.getTask(5);
@@ -72,7 +72,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(12);
         tasksManager.getSubtask(15);
 
-        final List<Task> history5 = historyManager.getHistory();
+        final List<Task> history5 = tasksManager.getHistory();
         assertEquals(10, history5.size());
     }
 }

@@ -31,9 +31,4 @@ public interface TasksManager {
     void deleteTasks();
     void deleteSubtasks();
     void deleteEpics();
-
-    // по поводу переноса этого метода не уверен, так как его не было в ТЗ изначально, а по ТЗ ФЗ 5 спринта указано:
-    // "Вспомогательные методы, если вы их создавали, переносить в интерфейс не нужно."
-    void updateEpicStatus(Epic epic);
-
 }
