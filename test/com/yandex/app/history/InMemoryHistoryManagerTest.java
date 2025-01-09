@@ -15,7 +15,7 @@ class InMemoryHistoryManagerTest {
     InMemoryTasksManager tasksManager = new InMemoryTasksManager();
 
     @Test
-    void addAndGetHistory() {
+    void addAndGetHistory() { // Проверка работы истории и корректность добавления задач, которые уже есть в истории
         tasksManager.addNewTask(new Task("Task#1 deleteEpics", "deleteEpics#1 description"));
         tasksManager.addNewTask(new Task("Task#2 deleteEpics", "deleteEpics#2 description"));
         tasksManager.addNewTask(new Task("Task#3 deleteEpics", "deleteEpics#3 description"));
@@ -64,7 +64,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(14);
 
         final List<Task> history4 = tasksManager.getHistory();
-        assertEquals(10, history4.size());
+        assertEquals(12, history4.size()); // Убрали лимиты, теперь задач больше 10
 
         tasksManager.getTask(5);
         tasksManager.getEpic(10);
@@ -73,6 +73,15 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(15);
 
         final List<Task> history5 = tasksManager.getHistory();
-        assertEquals(10, history5.size());
+        assertEquals(17, history5.size());
+
+        // Повторное добавление тех же задач, в другом порядке, для проверки отсутствия дублей
+        tasksManager.getTask(5);
+        tasksManager.getEpic(10);
+        tasksManager.getSubtask(15);
+        tasksManager.getSubtask(11);
+        tasksManager.getSubtask(12);
+
+        assertEquals(17, history5.size());
     }
 }

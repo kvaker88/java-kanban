@@ -2,26 +2,87 @@ package com.yandex.app.history;
 
 import com.yandex.app.task.Task;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private static final int HISTORY_LIMIT = 10;
-    private final List<Task> history = new ArrayList<>(); // История просмотров задач
+    private Map<Integer, Node> history = new HashMap<>(); // История просмотров задач
+    private Node tail;
+    private Node head;
 
     @Override
-    public void addHistory(Task task) {
-        if (task != null) {
-            if (history.size() == HISTORY_LIMIT) {
-                history.removeFirst();
-            }
-            history.add(task);
+    public void add(Task task) {
+        if (task == null) {
+            return;
         }
+
+        if (history.containsKey(task.getId())) {
+            remove(task.getId()); // Удаляем существующую задачу
+        }
+
+        Node oldTail = tail;
+        Node newNode = new Node<>(tail, task, null);
+        tail = newNode;
+
+        if (oldTail == null) {
+            head = newNode;
+        } else {
+            oldTail.next = newNode;
+        }
+
+        history.put(task.getId(), newNode); // Добавляем в HashMap
     }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        Node log = head;
+
+        List<Task> historyList = new ArrayList<>();
+        while (log != null) {
+            historyList.add(log.task);
+            log = (Node) log.next;
+        }
+        return historyList;
+    }
+
+    @Override
+    public void remove(int id) {
+        Node nodeToRemove = history.get(id);
+
+        if (nodeToRemove == null) {
+            return;
+        }
+
+        if (nodeToRemove.prev != null) {
+            nodeToRemove.prev = nodeToRemove.next;
+        } else {
+            head = (Node) nodeToRemove.next;
+        }
+
+        if (nodeToRemove.next != null) {
+            nodeToRemove.next = nodeToRemove.prev;
+        } else {
+            tail = (Node) nodeToRemove.prev;
+        }
+        history.remove(id);
+    }
+
+    public void removeNode(Node node) {
+        Node nextNode = (Node) node.next;
+        Node prevNode = (Node) node.prev;
+
+        if (node.equals(head)) {
+            head = nextNode;
+            nextNode.prev = null;
+        } else if (node.equals(tail)) {
+            if (node.prev != null) {
+                tail = prevNode;
+                prevNode.next = null;
+            }
+        } else {
+            nextNode.prev = prevNode;
+            prevNode.next = nextNode;
+        }
+        history.remove(node.task.getId());
     }
 }

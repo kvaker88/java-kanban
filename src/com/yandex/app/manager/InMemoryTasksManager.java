@@ -71,7 +71,7 @@ public class InMemoryTasksManager implements TasksManager {
     @Override
     public Epic getEpic(int id) { // метод для получения информации по отдельному Эпику по ID
         if (epics.containsKey(id)) {
-            historyManager.addHistory(epics.get(id));
+            historyManager.add(epics.get(id));
             return epics.get(id);
         } else {
             System.out.println("Эпика с указанным ID нет в списке.");
@@ -82,7 +82,7 @@ public class InMemoryTasksManager implements TasksManager {
     @Override
     public Task getTask(int id) { // метод для получения информации по отдельной подзадаче по ID
         if (tasks.containsKey(id)) {
-            historyManager.addHistory(tasks.get(id));
+            historyManager.add(tasks.get(id));
             return tasks.get(id);
         } else {
             System.out.println("Задачи с указанным ID нет в списке.");
@@ -93,7 +93,7 @@ public class InMemoryTasksManager implements TasksManager {
     @Override
     public SubTask getSubtask(int id) { // метод для получения информации по отдельной подзадаче по ID
         if (subtasks.containsKey(id)) {
-            historyManager.addHistory(subtasks.get(id));
+            historyManager.add(subtasks.get(id));
             return subtasks.get(id);
         } else {
             System.out.println("Подзадачи с указанным ID нет в списке.");
