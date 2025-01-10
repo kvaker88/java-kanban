@@ -6,7 +6,7 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private Map<Integer, Node> history = new HashMap<>(); // История просмотров задач
+    private final Map<Integer, Node> history = new HashMap<>(); // История просмотров задач
     private Node tail;
     private Node head;
 
@@ -20,25 +20,25 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         Node oldTail = tail;
-        Node newNode = new Node<>(tail, task, null);
+        Node newNode = new Node(tail, task, null);
         tail = newNode;
 
         if (oldTail == null) {
             head = newNode;
         } else {
-            oldTail.next = newNode;
+            oldTail.setNext(newNode);
         }
         history.put(task.getId(), newNode);
     }
 
     @Override
     public List<Task> getHistory() {
-        Node log = head;
+        Node currentNode = head;
 
         List<Task> historyList = new ArrayList<>();
-        while (log != null) {
-            historyList.add(log.task);
-            log = (Node) log.next;
+        while (currentNode != null) {
+            historyList.add(currentNode.task);
+            currentNode = currentNode.getNext();
         }
         return historyList;
     }
@@ -49,15 +49,19 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (nodeToRemove == null) {
             return;
         }
-        if (nodeToRemove.prev != null) {
-            nodeToRemove.getPrev().next = nodeToRemove.next;
+        if (nodeToRemove.getPrev() != null) {
+            nodeToRemove
+                    .getPrev()
+                    .setNext(nodeToRemove.getNext());
         } else {
-            head = (Node) nodeToRemove.next;
+            head = nodeToRemove.getNext();
         }
-        if (nodeToRemove.next != null) {
-            nodeToRemove.getNext().prev = nodeToRemove.prev;
+        if (nodeToRemove.getNext() != null) {
+            nodeToRemove
+                    .getNext()
+                    .setPrev(nodeToRemove.getPrev());
         } else {
-            tail = (Node) nodeToRemove.prev;
+            tail = nodeToRemove.getPrev();
         }
         history.remove(id);
     }

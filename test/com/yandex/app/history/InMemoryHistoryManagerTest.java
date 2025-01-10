@@ -84,4 +84,25 @@ class InMemoryHistoryManagerTest {
 
         assertEquals(15, history5.size());
     }
+
+    @Test
+    void removeHistory() { // Проверка работы метода InMemoryHistoryManager.remove()
+        tasksManager.addNewTask(new Task("Task#1", "TaskDescription#1"));
+        tasksManager.addNewTask(new Task("Task#2", "TaskDescription#2"));
+        Task task3 = new Task("Test#3", "TaskDescription#3");
+        tasksManager.addNewTask(task3);
+
+        tasksManager.getTask(1);
+        tasksManager.getTask(2);
+        tasksManager.getTask(3);
+
+        tasksManager.deleteTask(1);
+        tasksManager.deleteTask(2);
+
+        final List<Task> history = tasksManager.getHistory();
+        final List<Task> taskForTest = tasksManager.getTasks();
+
+        assertEquals(1, history.size());
+        assertEquals(taskForTest, tasksManager.getHistory(), "Задача не совпадают.");
+    }
 }

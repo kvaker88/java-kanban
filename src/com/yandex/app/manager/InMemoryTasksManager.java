@@ -181,12 +181,20 @@ public class InMemoryTasksManager implements TasksManager {
 
     @Override
     public void deleteTasks() { // метод для удаления всех обычных задач
-        tasks.clear();
+        List<Integer> tasksId = new ArrayList<>(tasks.keySet());
+        for (Integer id : tasksId) {
+            removeHistory(id);
+            tasks.remove(id);
+        }
     }
 
     @Override
     public void deleteSubtasks() { // метод для удаления всех подзадач
-        subtasks.clear();
+        List<Integer> subTasksId = new ArrayList<>(subtasks.keySet());
+        for (Integer id : subTasksId) {
+            removeHistory(id);
+            subtasks.remove(id);
+        }
         for (Epic epic : epics.values()) {
             epic.setStatus(Status.NEW);
             epic.removeAllSubTask();
@@ -195,8 +203,18 @@ public class InMemoryTasksManager implements TasksManager {
 
     @Override
     public void deleteEpics() { // метод для удаления всех Эпиков и подзадач
-        epics.clear();
-        subtasks.clear();
+        List<Integer> subTasksId = new ArrayList<>(subtasks.keySet());
+        List<Integer> epicsId = new ArrayList<>(epics.keySet());
+
+        for (Integer id : subTasksId) {
+            removeHistory(id);
+            subtasks.remove(id);
+        }
+        for (Integer id : epicsId) {
+            removeHistory(id);
+            epics.remove(id);
+        }
+
     }
 
     // метод для проверки и изменения статуса Эпика при изменении статуса подзадач или их удалении
@@ -237,6 +255,12 @@ public class InMemoryTasksManager implements TasksManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
+
+    @Override
+    public void removeHistory(int id) {
+        historyManager.remove(id);
+    }
+
 }
 
 

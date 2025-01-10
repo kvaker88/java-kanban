@@ -2,12 +2,12 @@ package com.yandex.app.history;
 
 import com.yandex.app.task.Task;
 
-public class Node<N, P> {
+public class Node {
     public Task task;
-    public N next;
-    public P prev;
+    private Node next;
+    private Node prev;
 
-    public Node(P prev, Task task, N next){
+    public Node(Node prev, Task task, Node next){
         this.task = task;
         this.next = next;
         this.prev = prev;
@@ -15,11 +15,18 @@ public class Node<N, P> {
 
     // Методы ниже нужны для упрощения взаимодействия в методе InMemoryHistoryManager.remove(id)
     public Node getNext() {
-        return (Node) next;
+        return next;
     }
 
     public Node getPrev() {
-        return (Node) prev;
+        return prev;
     }
 
+    public void setNext(Node next) {
+        this.next = next;
+    }
+
+    public void setPrev(Node prev) {
+        this.prev = prev;
+    }
 }

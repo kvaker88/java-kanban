@@ -5,7 +5,6 @@ import com.yandex.app.task.Epic;
 import com.yandex.app.task.SubTask;
 import com.yandex.app.task.Task;
 
-
 public class Main {
     public static void main(String[] args) {
         InMemoryTasksManager tasksManager = new InMemoryTasksManager();
