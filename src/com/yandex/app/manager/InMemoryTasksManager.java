@@ -181,40 +181,34 @@ public class InMemoryTasksManager implements TasksManager {
 
     @Override
     public void deleteTasks() { // метод для удаления всех обычных задач
-        List<Integer> tasksId = new ArrayList<>(tasks.keySet());
-        for (Integer id : tasksId) {
+        for (Integer id : tasks.keySet()) {
             historyManager.remove(id);
-            tasks.remove(id);
         }
+        tasks.clear();
     }
 
     @Override
     public void deleteSubtasks() { // метод для удаления всех подзадач
-        List<Integer> subTasksId = new ArrayList<>(subtasks.keySet());
-        for (Integer id : subTasksId) {
+        for (Integer id : subtasks.keySet()) {
             historyManager.remove(id);
-            subtasks.remove(id);
         }
         for (Epic epic : epics.values()) {
             epic.setStatus(Status.NEW);
             epic.removeAllSubTask();
         }
+        subtasks.clear();
     }
 
     @Override
     public void deleteEpics() { // метод для удаления всех Эпиков и подзадач
-        List<Integer> subTasksId = new ArrayList<>(subtasks.keySet());
-        List<Integer> epicsId = new ArrayList<>(epics.keySet());
-
-        for (Integer id : subTasksId) {
+        for (Integer id : subtasks.keySet()) {
             historyManager.remove(id);
-            subtasks.remove(id);
         }
-        for (Integer id : epicsId) {
+        for (Integer id : epics.keySet()) {
             historyManager.remove(id);
-            epics.remove(id);
         }
-
+        subtasks.clear();
+        epics.clear();
     }
 
     // метод для проверки и изменения статуса Эпика при изменении статуса подзадач или их удалении
