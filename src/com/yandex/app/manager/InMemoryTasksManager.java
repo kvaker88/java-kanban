@@ -183,7 +183,7 @@ public class InMemoryTasksManager implements TasksManager {
     public void deleteTasks() { // метод для удаления всех обычных задач
         List<Integer> tasksId = new ArrayList<>(tasks.keySet());
         for (Integer id : tasksId) {
-            removeHistory(id);
+            historyManager.remove(id);
             tasks.remove(id);
         }
     }
@@ -192,7 +192,7 @@ public class InMemoryTasksManager implements TasksManager {
     public void deleteSubtasks() { // метод для удаления всех подзадач
         List<Integer> subTasksId = new ArrayList<>(subtasks.keySet());
         for (Integer id : subTasksId) {
-            removeHistory(id);
+            historyManager.remove(id);
             subtasks.remove(id);
         }
         for (Epic epic : epics.values()) {
@@ -207,11 +207,11 @@ public class InMemoryTasksManager implements TasksManager {
         List<Integer> epicsId = new ArrayList<>(epics.keySet());
 
         for (Integer id : subTasksId) {
-            removeHistory(id);
+            historyManager.remove(id);
             subtasks.remove(id);
         }
         for (Integer id : epicsId) {
-            removeHistory(id);
+            historyManager.remove(id);
             epics.remove(id);
         }
 
@@ -255,12 +255,6 @@ public class InMemoryTasksManager implements TasksManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
-
-    @Override
-    public void removeHistory(int id) {
-        historyManager.remove(id);
-    }
-
 }
 
 
