@@ -31,27 +31,33 @@ public class Main {
         tasksManager.getTask(1);
 
         System.out.println("-".repeat(40));
-        System.out.println("Первый вывод. Задачи 5, 2, 7, 1:");
+        System.out.println("Первый вывод 5, 2, 7, 1:");
         System.out.println(tasksManager.getHistory());
         System.out.println("-".repeat(40));
 
         tasksManager.getTask(2);
-        System.out.println(tasksManager.getHistory());
-        System.out.println("-".repeat(40));
         tasksManager.getSubtask(5);
-        System.out.println(tasksManager.getHistory());
-        System.out.println("-".repeat(40));
-        tasksManager.getSubtask(5);
-        System.out.println("-".repeat(40));
+        tasksManager.getSubtask(4);
         tasksManager.getEpic(7);
-        System.out.println(tasksManager.getHistory());
-        System.out.println("-".repeat(40));
         tasksManager.getTask(1);
-        System.out.println(tasksManager.getHistory());
-        System.out.println("-".repeat(40));
+        tasksManager.getEpic(3);
         tasksManager.getSubtask(5);
 
-        System.out.println("Второй вывод. Задачи 7, 1, 5:");
+        System.out.println("Второй вывод 2, 4, 7, 1, 3, 5:");
+        System.out.println(tasksManager.getHistory()); // Второй вывод. Задачи
+        System.out.println("-".repeat(40));
+
+        tasksManager.deleteTask(2);
+        tasksManager.deleteEpic(3);
+
+        System.out.println("Третий вывод 7, 1:");
+        System.out.println(tasksManager.getHistory()); // Второй вывод. Задачи
+        System.out.println("-".repeat(40));
+
+        tasksManager.deleteTask(1);
+        tasksManager.deleteEpic(7);
+
+        System.out.println("Четвёртый пустой вывод:");
         System.out.println(tasksManager.getHistory()); // Второй вывод. Задачи
         System.out.println("-".repeat(40));
     }

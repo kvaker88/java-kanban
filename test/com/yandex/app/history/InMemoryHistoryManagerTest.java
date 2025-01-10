@@ -28,13 +28,13 @@ class InMemoryHistoryManagerTest {
         tasksManager.addNewEpic(new Epic("Test#9 deleteEpics", "deleteEpics#9 description"));
         tasksManager.addNewEpic(new Epic("Test#10 deleteEpics", "deleteEpics#10 description"));
 
-        tasksManager.addNewSubtask(6, (new SubTask(6,"Test#11 deleteEpics",
+        tasksManager.addNewSubtask(6, (new SubTask(6, "Test#11 deleteEpics",
                 "deleteEpics#11 description")));
-        tasksManager.addNewSubtask(7, (new SubTask(7,"Test#12 deleteEpics",
+        tasksManager.addNewSubtask(7, (new SubTask(7, "Test#12 deleteEpics",
                 "deleteEpics#12 description")));
-        tasksManager.addNewSubtask(8, (new SubTask(8,"Test#13 deleteEpics",
+        tasksManager.addNewSubtask(8, (new SubTask(8, "Test#13 deleteEpics",
                 "deleteEpics#13 description")));
-        tasksManager.addNewSubtask(9, (new SubTask(9,"Test#14 deleteEpics",
+        tasksManager.addNewSubtask(9, (new SubTask(9, "Test#14 deleteEpics",
                 "deleteEpics#14 description")));
         tasksManager.addNewSubtask(10, (new SubTask(10, "Test#15 deleteEpics",
                 "deleteEpics#15 description")));
@@ -73,7 +73,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(15);
 
         final List<Task> history5 = tasksManager.getHistory();
-        assertEquals(17, history5.size());
+        assertEquals(15, history5.size());
 
         // Повторное добавление тех же задач, в другом порядке, для проверки отсутствия дублей
         tasksManager.getTask(5);
@@ -82,6 +82,6 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(11);
         tasksManager.getSubtask(12);
 
-        assertEquals(17, history5.size());
+        assertEquals(15, history5.size());
     }
 }

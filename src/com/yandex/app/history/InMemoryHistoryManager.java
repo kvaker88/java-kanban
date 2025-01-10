@@ -15,7 +15,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             return;
         }
-
         if (history.containsKey(task.getId())) {
             remove(task.getId()); // Удаляем существующую задачу
         }
@@ -29,8 +28,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         } else {
             oldTail.next = newNode;
         }
-
-        history.put(task.getId(), newNode); // Добавляем в HashMap
+        history.put(task.getId(), newNode);
     }
 
     @Override
@@ -48,41 +46,19 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void remove(int id) {
         Node nodeToRemove = history.get(id);
-
         if (nodeToRemove == null) {
             return;
         }
-
         if (nodeToRemove.prev != null) {
-            nodeToRemove.prev = nodeToRemove.next;
+            nodeToRemove.getPrev().next = nodeToRemove.next;
         } else {
             head = (Node) nodeToRemove.next;
         }
-
         if (nodeToRemove.next != null) {
-            nodeToRemove.next = nodeToRemove.prev;
+            nodeToRemove.getNext().prev = nodeToRemove.prev;
         } else {
             tail = (Node) nodeToRemove.prev;
         }
         history.remove(id);
-    }
-
-    public void removeNode(Node node) {
-        Node nextNode = (Node) node.next;
-        Node prevNode = (Node) node.prev;
-
-        if (node.equals(head)) {
-            head = nextNode;
-            nextNode.prev = null;
-        } else if (node.equals(tail)) {
-            if (node.prev != null) {
-                tail = prevNode;
-                prevNode.next = null;
-            }
-        } else {
-            nextNode.prev = prevNode;
-            prevNode.next = nextNode;
-        }
-        history.remove(node.task.getId());
     }
 }

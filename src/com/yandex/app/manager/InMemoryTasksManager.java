@@ -143,6 +143,7 @@ public class InMemoryTasksManager implements TasksManager {
     @Override
     public void deleteTask(int id) { // метод для удаления задачи по ID
         if (tasks.containsKey(id)) {
+            historyManager.remove(id);
             tasks.remove(id);
         } else {
             System.out.println("Задача с указанным ID не найдена.");
@@ -155,7 +156,9 @@ public class InMemoryTasksManager implements TasksManager {
             List<SubTask> subTasks = getEpicSubtasks(id);
             for (SubTask subTask : subTasks) {
                 subtasks.remove(subTask.getId());
+                historyManager.remove(subTask.getId());
             }
+            historyManager.remove(id);
             epics.remove(id);
         } else {
             System.out.println("Эпик с указанным ID не найден.");
@@ -169,6 +172,7 @@ public class InMemoryTasksManager implements TasksManager {
             Epic epic = epics.get(subTask.getEpicId());
             epic.removeSubTask(subTask.getId());
             updateEpicStatus(epic);
+            historyManager.remove(id);
             subtasks.remove(id);
         } else {
             System.out.println("Подзадача с указанным ID не найден.");

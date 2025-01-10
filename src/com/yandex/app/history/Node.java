@@ -13,8 +13,13 @@ public class Node<N, P> {
         this.prev = prev;
     }
 
-    @Override
-    public String toString() {
-        return task.toString();
+    // Методы ниже нужны для упрощения взаимодействия в методе InMemoryHistoryManager.remove(id)
+    public Node getNext() {
+        return (Node) next;
     }
+
+    public Node getPrev() {
+        return (Node) prev;
+    }
+
 }
