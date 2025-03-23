@@ -8,6 +8,7 @@ public class Task {
     protected String name; // имя
     protected String description; // описание
     protected Status status = Status.NEW;
+    protected Type type = Type.TASK; // задаём по дефолту тип TASK для обычных задач
 
     // конструтор для изменения существующей задачи, без статуса
     public Task(int id, String name, String description) {
@@ -27,6 +28,10 @@ public class Task {
     public Task(String name, String description) { // конструктор для создания новой задачи
         this.name = name;
         this.description = description;
+    }
+
+    public Task() { // конструктор работы метода FileBackedTasksManager.addTaskFromFile()
+    // информация заполняется с помощью сеттеров
     }
 
     public int getId() {
@@ -81,5 +86,9 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public String toStringToFile() { // метод на подобии toString, только для сохранения задачи в файл
+        return id + "," + type + "," + name + "," + status + "," + description + "\n";
     }
 }

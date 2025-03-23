@@ -1,8 +1,9 @@
 package com.yandex.app.task;
 
-    // класс для выполнения действий с подзадачами
+// класс для выполнения действий с подзадачами
 public class SubTask extends Task {
     private final int epicId; // у каждой подзадачи есть свой эпик, к которому он привязан
+    private Type type = Type.SUBTASK; // задаём по дефолту тип SUBTASK для подзадач
 
     // конструктор для создания подзадачи
     public SubTask(int epicId, String name, String description) {
@@ -14,6 +15,10 @@ public class SubTask extends Task {
     public SubTask(int id, int epicId, String name, String description, Status stat) {
         super(id, name, description, stat);
         this.epicId = epicId;
+    }
+
+    public SubTask(int epicId) { // конструктор работы метода FileBackedTasksManager.addTaskFromFile()
+        this.epicId = epicId; // основная информация заполняется с помощью сеттеров
     }
 
     public int getEpicId() { // метод для получения ID эпика подзадачи
@@ -28,5 +33,10 @@ public class SubTask extends Task {
                 ", Название: " + name +
                 ", Описание: " + description +
                 ", Статус:" + status + "}";
+    }
+
+    @Override
+    public String toStringToFile() { // метод на подобии toString, только для сохранения подзадачи в файл
+        return id + "," + type + "," + name + "," + status + "," + description + "," + epicId + "\n";
     }
 }
