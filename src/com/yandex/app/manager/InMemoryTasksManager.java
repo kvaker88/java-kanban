@@ -14,12 +14,13 @@ public class InMemoryTasksManager implements TasksManager {
     protected final Map<Integer, Epic> epics = new HashMap<>(); // Эпики
     protected final Map<Integer, SubTask> subtasks = new HashMap<>(); // Подзадачи
 
-    private int id = 1; // счётчик ID задач
+    protected int id = 1; // счётчик ID задач
 
     @Override
     public int addNewTask(Task task) {
         task.setId(id);
-        tasks.put(id++, task); // Добавляем задачу в Map
+        tasks.put(id, task); // Добавляем задачу в Map
+        id++;
         return task.getId(); // Возвращаем ID добавленной задачи
     }
 
@@ -68,7 +69,6 @@ public class InMemoryTasksManager implements TasksManager {
         }
     }
 
-    @Override
     public Epic getEpic(int id) { // метод для получения информации по отдельному Эпику по ID
         if (epics.containsKey(id)) {
             historyManager.add(epics.get(id));

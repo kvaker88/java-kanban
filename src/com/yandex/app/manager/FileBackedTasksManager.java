@@ -1,17 +1,24 @@
 package com.yandex.app.manager;
 
-import com.yandex.app.exeptions.ManagerSaveException;
+import com.yandex.app.exceptions.ManagerSaveException;
 import com.yandex.app.task.*;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FileBackedTasksManager extends InMemoryTasksManager {
 
-    // Создавать файл во временной директории тут не стал, чтобы файл не удалялся после завершения работы программы
-    private final Path path = Path.of("C:\\Users\\tihon\\IdeaProjects\\java-kanban\\");
+    private static final String HEADER = "id,type,name,status,description,epic\n";
+    private static final Path PATH = Path.of(".\\");
+
+        /* Немного изменил логику передачи задач, чтобы вместе с ними передавались упорядоченные ID.
+        Нужно это для того, чтобы HashMap всегда передавал упорядоченные задачи любого количества на сохранение,
+        чтобы исключить вариант перемешивания ID и чтобы при загрузке он всегда устанавливался больше на единицу.
+        Изменения задели методы groupAllTasksToString и allTasksToString. */
 
     private String groupAllTasksToString() { // разбил методы для скрытия работы кода
         Map<Integer, Task> allTasks = new HashMap<>();
@@ -19,77 +26,88 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         allTasks.putAll(epics);
         allTasks.putAll(subtasks);
 
-        return allTasksToString(allTasks);
+        Object[] arr = allTasks.keySet().toArray(); // создаём массив ID по ключам мапы
+        Arrays.sort(arr); // сортируем
+
+        return allTasksToString(List.of(arr), allTasks); // передаём массив и мапу с задачами для записи в String
+
     }
 
-    private String allTasksToString(Map<Integer, Task> tasks) {
+    private String allTasksToString(List<Object> arr, Map<Integer, Task> allTasks) {
         StringBuilder tasksString = new StringBuilder();
 
-        for (Task task : tasks.values()) {
-            tasksString.append(task.toStringToFile());
+        for (Object id : arr) {
+            int idToInt = Integer.parseInt(id.toString()); // перезаписываем ID из Object в int
+            tasksString.append(allTasks.get(idToInt).toStringToFile()); // добавляем задачу по полученному ID в строку
         }
-        return tasksString.toString();
+        return tasksString.toString(); // отдаём готовую строку со всеми задачами
     }
 
-    public void save() { // метод для сохранения существующих задач всех типов в файл
-        try (Writer fileWriter = new FileWriter(path + "\\save.csv", false)) {
-            fileWriter.write("id,type,name,status,description,epic\n"); // дефолтная первая строка с пояснением
+    private void save() { // метод для сохранения существующих задач всех типов в файл
+        try (Writer fileWriter = new FileWriter(PATH + "\\save.csv", false)) {
+            fileWriter.write(HEADER); // дефолтная первая строка с пояснением
             fileWriter.write(groupAllTasksToString());
         } catch (IOException exception) {
             throw new ManagerSaveException("Не удалось записать файл.");
         }
     }
 
-    public void loadFromFile(File file) {
-        // не понимаю как тут реализовать static
-        // если поменять модификатор, нужно будет изменить его в addTaskFromFile и, соответственно,
-        // во всех созданиях задач основного менеджера, что не круто
+    public static FileBackedTasksManager loadFromFile(File file) {
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            bufferedReader.readLine();
+            bufferedReader.readLine(); // пропускаем первую строку
 
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 if (!line.equals("")) {
-                    addTaskFromFile(line.split(","));
+                    addTaskFromFile(line.split(","), fileBackedTasksManager);
                 }
+                fileBackedTasksManager.id = Integer.parseInt(String.valueOf(line.charAt(0))) + 1; // устанавливаем ID последней задачи
             }
+            bufferedReader.close();
         } catch (IOException exception) {
             System.out.println("Не удалось прочитать файл.");
         }
+        return fileBackedTasksManager;
     }
 
-    private void addTaskFromFile(String[] taskArr) { // разбил метод на два, чтобы сократить кол-во кода
+    private static void addTaskFromFile(String[] taskArr, FileBackedTasksManager fileBackedTasksManager) {
         // текущий метод создаёт пустые задачи нужного типа по первому индексу каждой строки файла
         switch (Type.valueOf(taskArr[1])) {
             case TASK: {
-                Task task = new Task();
-                addNewTask(taskEditor(taskArr, task));
+                fileBackedTasksManager.tasks.put(Integer.parseInt(taskArr[0]), // добавляем задачу напрямую в мапу
+                        new Task(Integer.parseInt(taskArr[0]), // добавляем айди задачи
+                        taskArr[2], // добавляем имя
+                        taskArr[4], // добавляем описание
+                        Status.valueOf(taskArr[3]))); // устанавливаем статус
                 break;
             }
 
             case EPIC: {
-                Task task = new Epic();
-                addNewEpic((Epic) taskEditor(taskArr, task));
+                fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]), // добавляем задачу напрямую в мапу
+                        new Epic(Integer.parseInt(taskArr[0]), // добавляем айди задачи
+                        taskArr[2], // добавляем имя
+                        taskArr[4], // добавляем описание
+                        Status.valueOf(taskArr[3]))); // устанавливаем статус
                 break;
             }
 
             case SUBTASK: {
-                Task task = new SubTask(Integer.parseInt(taskArr[5]));
-                addNewSubtask(Integer.parseInt(taskArr[5]), (SubTask) taskEditor(taskArr, task));
-                // на всякий случай, если файл будет правиться вручную и будет допущена ошибка в статусах эпика
-                updateEpicStatus(getEpic(Integer.parseInt(taskArr[5])));
+                SubTask subTask = new SubTask(Integer.parseInt(taskArr[0]), // добавляем айди задачи
+                        Integer.parseInt(taskArr[5]), // ещё раз добвляем айди эпика
+                        taskArr[2], // добавляем имя
+                        taskArr[4], // добавляем описание
+                        Status.valueOf(taskArr[3]));// устанавливаем статус
+
+                fileBackedTasksManager.subtasks.put(Integer.parseInt(taskArr[0]), subTask);
+                // добавляем подзадачу с айди эпика напрямую в мапу
+
+                fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])).addSubTask(subTask);
+                // добавляем связь между эпиком и подзадачей
                 break;
             }
         }
-    }
-
-    private Task taskEditor(String[] taskArr, Task task) { // метод детальнее наполняет каждую задачу из файла
-        task.setId(Integer.parseInt(taskArr[0]));
-        task.setName(taskArr[2]);
-        task.setStatus(Status.valueOf(taskArr[3]));
-        task.setDescription(taskArr[4]);
-        return task;
     }
 
     @Override

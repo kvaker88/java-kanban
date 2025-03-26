@@ -17,10 +17,6 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
-    public SubTask(int epicId) { // конструктор работы метода FileBackedTasksManager.addTaskFromFile()
-        this.epicId = epicId; // основная информация заполняется с помощью сеттеров
-    }
-
     public int getEpicId() { // метод для получения ID эпика подзадачи
         return epicId;
     }

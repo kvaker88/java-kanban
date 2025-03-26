@@ -16,7 +16,6 @@ public class Main {
         final Path path = Path.of("C:\\Users\\tihon\\IdeaProjects\\java-kanban\\");
         FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultTasksManager();
 
-        fileBackedTasksManager.save();
         fileBackedTasksManager.loadFromFile(new File(path + "save.csv"));
         System.out.println("Сохранились, загрузили пустой файл ");
 
@@ -38,9 +37,12 @@ public class Main {
 
         // Проверяем какие задачи в программе, сверяем с содержимым файла
 
-        System.out.println(fileBackedTasksManager.getTasks());
-        System.out.println(fileBackedTasksManager.getEpics());
-        System.out.println(fileBackedTasksManager.getSubtasks());
+        FileBackedTasksManager fileBackedTasksManager1 = fileBackedTasksManager
+                .loadFromFile(new File("C:\\Users\\tihon\\IdeaProjects\\java-kanban\\save.csv"));
+
+        System.out.println("Задачи - " + fileBackedTasksManager1.getTasks());
+        System.out.println("Эпики - " + fileBackedTasksManager1.getEpics());
+        System.out.println("Подзадачи - " + fileBackedTasksManager1.getSubtasks());
 
         // Задачи из программы соответствуют содержимому файла
     }

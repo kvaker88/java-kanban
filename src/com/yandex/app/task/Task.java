@@ -30,10 +30,6 @@ public class Task {
         this.description = description;
     }
 
-    public Task() { // конструктор работы метода FileBackedTasksManager.addTaskFromFile()
-    // информация заполняется с помощью сеттеров
-    }
-
     public int getId() {
         return id;
     }

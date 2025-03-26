@@ -18,8 +18,8 @@ public class Epic extends Task {
         super(name, description);
     }
 
-    public Epic() { // конструктор работы метода FileBackedTasksManager.addTaskFromFile()
-    // информация заполняется с помощью сетеров
+    public Epic(int id, String name, String description, Status status) {
+        super(id, name, description, status);
     }
 
     // метод для добавления подзадач
