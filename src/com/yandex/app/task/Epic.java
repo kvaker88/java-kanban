@@ -6,6 +6,7 @@ import java.util.List;
 // класс для выполнения действий с Эпиками
 public class Epic extends Task {
     private final List<SubTask> subtasks = new ArrayList<>(); // создаём список подзадач
+    private Type type = Type.EPIC; // задаём по дефолту тип EPIC для эпиков
 
     // метод для создания Эпика
     public Epic(int id, String name, String description) {
@@ -15,6 +16,10 @@ public class Epic extends Task {
 
     public Epic(String name, String description) {
         super(name, description);
+    }
+
+    public Epic(int id, String name, String description, Status status) {
+        super(id, name, description, status);
     }
 
     // метод для добавления подзадач
@@ -46,5 +51,10 @@ public class Epic extends Task {
                 ", Название: " + name +
                 ", Описание: " + description +
                 ", Статус:" + status + "}";
+    }
+
+    @Override
+    public String toStringToFile() { // метод на подобии toString, только для сохранения задачи в файл
+        return id + "," + type + "," + name + "," + status + "," + description + "\n";
     }
 }

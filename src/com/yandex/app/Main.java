@@ -1,63 +1,52 @@
 package com.yandex.app;
 
-import com.yandex.app.manager.InMemoryTasksManager;
+import com.yandex.app.manager.FileBackedTasksManager;
+import com.yandex.app.manager.Managers;
 import com.yandex.app.task.Epic;
+import com.yandex.app.task.Status;
 import com.yandex.app.task.SubTask;
 import com.yandex.app.task.Task;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Main {
     public static void main(String[] args) {
-        InMemoryTasksManager tasksManager = new InMemoryTasksManager();
+        // перемененная для последующей загрузки из файла
+        File file = null;
+        try {
+            file = File.createTempFile("save_", ".csv");
+        } catch (IOException exception) {
+            System.out.println(exception);
+        }
+        FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultTasksManager(file);
 
-        tasksManager.addNewTask(new Task("Task#1", "TaskDescription#1"));
-        tasksManager.addNewTask(new Task("Task#2", "TaskDescription#2"));
+        System.out.println("Сохранились, загрузили пустой файл ");
 
-        tasksManager.addNewEpic(new Epic("Epic#3", "EpicDescription#3"));
+        // Далее создаём задачи по ТЗ через новый менеджер, автоматически сохраняем в файл
 
-        tasksManager.addNewSubtask(3, (new SubTask(3, "SubTask#4",
-                "description#4")));
-        tasksManager.addNewSubtask(3, (new SubTask(3, "SubTask#5",
-                "SubTaskDescription#5")));
-        tasksManager.addNewSubtask(3, (new SubTask(3, "SubTask#6",
-                "SubTaskDescription#6")));
+        Task task = new Task("Task1", "Description task1");
+        task.setStatus(Status.DONE);
 
-        tasksManager.addNewEpic(new Epic("Epic#7", "EpicDescription#7"));
+        Epic epic = new Epic("Epic2", "Description epic2");
+        SubTask subTask = new SubTask(2, "Sub Task2", "Description sub task3");
+        subTask.setStatus(Status.DONE);
 
-        tasksManager.getSubtask(5);
-        tasksManager.getTask(2);
-        tasksManager.getTask(1);
-        tasksManager.getEpic(7);
-        tasksManager.getTask(1);
+        fileBackedTasksManager.addNewTask(task);
+        fileBackedTasksManager.addNewEpic(epic);
+        fileBackedTasksManager.addNewSubtask(2, subTask);
 
-        System.out.println("-".repeat(40));
-        System.out.println("Первый вывод 5, 2, 7, 1:");
-        System.out.println(tasksManager.getHistory());
-        System.out.println("-".repeat(40));
+        fileBackedTasksManager.updateSubtask(new SubTask(3, 2, "Sub Task2",
+                "Description sub task3", Status.DONE));
 
-        tasksManager.getTask(2);
-        tasksManager.getSubtask(5);
-        tasksManager.getSubtask(4);
-        tasksManager.getEpic(7);
-        tasksManager.getTask(1);
-        tasksManager.getEpic(3);
-        tasksManager.getSubtask(5);
+        // Проверяем какие задачи в программе, сверяем с содержимым файла
 
-        System.out.println("Второй вывод 2, 4, 7, 1, 3, 5:");
-        System.out.println(tasksManager.getHistory()); // Второй вывод. Задачи
-        System.out.println("-".repeat(40));
+        FileBackedTasksManager fileBackedTasksManager1 = fileBackedTasksManager.loadFromFile(file);
 
-        tasksManager.deleteTask(2);
-        tasksManager.deleteEpic(3);
+        System.out.println("Задачи - " + fileBackedTasksManager1.getTasks());
+        System.out.println("Эпики - " + fileBackedTasksManager1.getEpics());
+        System.out.println("Подзадачи - " + fileBackedTasksManager1.getSubtasks());
 
-        System.out.println("Третий вывод 7, 1:");
-        System.out.println(tasksManager.getHistory()); // Второй вывод. Задачи
-        System.out.println("-".repeat(40));
-
-        tasksManager.deleteTask(1);
-        tasksManager.deleteEpic(7);
-
-        System.out.println("Четвёртый пустой вывод:");
-        System.out.println(tasksManager.getHistory()); // Второй вывод. Задачи
-        System.out.println("-".repeat(40));
+        // Задачи из программы соответствуют содержимому файла
     }
 }

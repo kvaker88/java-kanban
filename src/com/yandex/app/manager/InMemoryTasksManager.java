@@ -10,11 +10,11 @@ public class InMemoryTasksManager implements TasksManager {
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
-    private final Map<Integer, Task> tasks = new HashMap<>(); // Обычные задачи
-    private final Map<Integer, Epic> epics = new HashMap<>(); // Эпики
-    private final Map<Integer, SubTask> subtasks = new HashMap<>(); // Подзадачи
+    protected final Map<Integer, Task> tasks = new HashMap<>(); // Обычные задачи
+    protected final Map<Integer, Epic> epics = new HashMap<>(); // Эпики
+    protected final Map<Integer, SubTask> subtasks = new HashMap<>(); // Подзадачи
 
-    private int id = 1; // счётчик ID задач
+    protected int id = 1; // счётчик ID задач
 
     @Override
     public int addNewTask(Task task) {
@@ -68,7 +68,6 @@ public class InMemoryTasksManager implements TasksManager {
         }
     }
 
-    @Override
     public Epic getEpic(int id) { // метод для получения информации по отдельному Эпику по ID
         if (epics.containsKey(id)) {
             historyManager.add(epics.get(id));
@@ -212,7 +211,7 @@ public class InMemoryTasksManager implements TasksManager {
     }
 
     // метод для проверки и изменения статуса Эпика при изменении статуса подзадач или их удалении
-    private void updateEpicStatus(Epic epic) {
+    protected void updateEpicStatus(Epic epic) {
         List<SubTask> epicSubTasks = getEpicSubtasks(epic.getId());
         if (epicSubTasks.isEmpty()) {
             epic.setStatus(Status.NEW);
