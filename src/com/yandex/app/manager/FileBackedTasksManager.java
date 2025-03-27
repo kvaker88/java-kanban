@@ -9,9 +9,11 @@ import java.io.*;
 public class FileBackedTasksManager extends InMemoryTasksManager {
 
     private static final String HEADER = "id,type,name,status,description,epic\n";
+    private static int maxId = 0;
 
     File file;
-    public FileBackedTasksManager (File file) {
+
+    public FileBackedTasksManager(File file) {
         this.file = file; // этот конструктор нужен для метода save()
     }
 
@@ -44,11 +46,11 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
     }
 
     public static FileBackedTasksManager loadFromFile(File file) {
+        maxId = 0; // сбрасываем, если загружается новый файл
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine(); // пропускаем первую строку
-
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 if (!line.equals("")) {
@@ -59,6 +61,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         } catch (IOException exception) {
             System.out.println("Не удалось прочитать файл.");
         }
+        fileBackedTasksManager.id = maxId + 1;
         return fileBackedTasksManager;
     }
 
@@ -68,20 +71,26 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
             case TASK: {
                 fileBackedTasksManager.tasks.put(Integer.parseInt(taskArr[0]), // добавляем задачу напрямую в мапу
                         new Task(Integer.parseInt(taskArr[0]), // добавляем айди задачи
-                        taskArr[2], // добавляем имя
-                        taskArr[4], // добавляем описание
-                        Status.valueOf(taskArr[3]))); // устанавливаем статус
-                fileBackedTasksManager.id++;
+                                taskArr[2], // добавляем имя
+                                taskArr[4], // добавляем описание
+                                Status.valueOf(taskArr[3]))); // устанавливаем статус
+
+                if (Integer.parseInt(taskArr[0]) > maxId) {
+                    maxId = Integer.parseInt(taskArr[0]);
+                }
                 break;
             }
 
             case EPIC: {
                 fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]), // добавляем задачу напрямую в мапу
                         new Epic(Integer.parseInt(taskArr[0]), // добавляем айди задачи
-                        taskArr[2], // добавляем имя
-                        taskArr[4], // добавляем описание
-                        Status.valueOf(taskArr[3]))); // устанавливаем статус
-                fileBackedTasksManager.id++;
+                                taskArr[2], // добавляем имя
+                                taskArr[4], // добавляем описание
+                                Status.valueOf(taskArr[3]))); // устанавливаем статус
+
+                if (Integer.parseInt(taskArr[0]) > maxId) {
+                    maxId = Integer.parseInt(taskArr[0]);
+                }
                 break;
             }
 
@@ -102,7 +111,10 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                     System.out.println("Подзадача с ID" + (Integer.parseInt(taskArr[0])) +
                             " не добавлена, так как не был найден Epic.");
                 }
-                fileBackedTasksManager.id++;
+
+                if (Integer.parseInt(taskArr[0]) > maxId) {
+                    maxId = Integer.parseInt(taskArr[0]);
+                }
                 break;
             }
         }

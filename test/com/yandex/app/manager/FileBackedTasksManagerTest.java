@@ -14,13 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FileBackedTasksManagerTest {
 
     @Test
-    void saveAndLoadEmptyFile() {
-        File file = null;
-        try {
-            file = File.createTempFile("save_", ".csv");
-        } catch (IOException exception) {
-            System.out.println(exception);
-        }
+    void saveAndLoadEmptyFile() throws IOException {
+        File file = File.createTempFile("save_", ".csv");
+
         FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(file);
         fileBackedTasksManager1.loadFromFile(file);
 
@@ -33,17 +29,12 @@ class FileBackedTasksManagerTest {
         FileBackedTasksManager fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
         String taskToString = fileBackedTasksManager2.getTask(1).toStringToFile();
         assertEquals(taskToString, "1,TASK,Task,NEW,Description\n", "Содержимое не совпадает");
-        file.deleteOnExit();
     }
 
     @Test
-    void save() {
-        File file = null;
-        try {
-            file = File.createTempFile("save_", ".csv");
-        } catch (IOException exception) {
-            System.out.println(exception);
-        }
+    void save() throws IOException {
+        File file = File.createTempFile("save_", ".csv");
+
         // создаём менеджер, в который добавляем одну задачу, методом addNewTask создаётся файл save.csv
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
         Task taskForTestSave = new Task(1,"Task1", "Description task1");
@@ -65,17 +56,11 @@ class FileBackedTasksManagerTest {
         }
         // проверяем, что файл содержит ту информацию, которую мы передавали в save
         assertEquals(taskToString, line, "Содержимое файла не совпадает с задачей");
-        file.deleteOnExit();
     }
 
     @Test
-    void loadFromFile() {
-        File file = null;
-        try {
-            file = File.createTempFile("save_", ".csv");
-        } catch (IOException exception) {
-            System.out.println(exception);
-        }
+    void loadFromFile() throws IOException {
+        File file = File.createTempFile("save_", ".csv");
 
         // Изменил тестирование метода. Вроде каждая задача будет сверена корректно между менеджерами.
         FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(file);
@@ -91,17 +76,19 @@ class FileBackedTasksManagerTest {
         String taskToString1 = fileBackedTasksManager1.tasks.get(1).toStringToFile();
         String epicToString1 = fileBackedTasksManager1.epics.get(2).toStringToFile();
         String subTaskToString1 = fileBackedTasksManager1.subtasks.get(3).toStringToFile();
+        String epicSubTasksToString1 = fileBackedTasksManager1.epics.get(2).getSubtasks().toString();
 
         // указываем путь до файла, создаём второй менеджер с использованием метода загрузки из ранее созданного файла
         FileBackedTasksManager fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
         String taskToString2 = fileBackedTasksManager2.getTask(1).toStringToFile();
         String epicToString2 = fileBackedTasksManager2.getEpic(2).toStringToFile();
         String subTaskToString2 = fileBackedTasksManager2.getSubtask(3).toStringToFile();
+        String epicSubTasksToString2 = fileBackedTasksManager2.epics.get(2).getSubtasks().toString();
 
         // Проверяем совпадение задач из двух менеджеров
         assertEquals(taskToString1, taskToString2, "Задача из загруженного файла не совпадает.");
         assertEquals(epicToString1, epicToString2, "Эпик из загруженного файла не совпадает.");
         assertEquals(subTaskToString1, subTaskToString2, "Подзадача из загруженного файла не совпадает.");
-        file.deleteOnExit();
+        assertEquals(epicSubTasksToString1, epicSubTasksToString2,"Подзадачи у эпика не совпадают.");
     }
 }
