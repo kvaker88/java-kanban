@@ -18,7 +18,6 @@ class FileBackedTasksManagerTest {
         File file = File.createTempFile("save_", ".csv");
 
         FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(file);
-        fileBackedTasksManager1.loadFromFile(file);
 
         Assertions.assertTrue(fileBackedTasksManager1.getTasks().isEmpty());
         Assertions.assertTrue(fileBackedTasksManager1.getEpics().isEmpty());

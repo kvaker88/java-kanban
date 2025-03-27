@@ -9,7 +9,6 @@ import java.io.*;
 public class FileBackedTasksManager extends InMemoryTasksManager {
 
     private static final String HEADER = "id,type,name,status,description,epic\n";
-    private static int maxId = 0;
 
     File file;
 
@@ -46,7 +45,6 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
     }
 
     public static FileBackedTasksManager loadFromFile(File file) {
-        maxId = 0; // сбрасываем, если загружается новый файл
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -61,7 +59,6 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         } catch (IOException exception) {
             System.out.println("Не удалось прочитать файл.");
         }
-        fileBackedTasksManager.id = maxId + 1;
         return fileBackedTasksManager;
     }
 
@@ -75,8 +72,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                                 taskArr[4], // добавляем описание
                                 Status.valueOf(taskArr[3]))); // устанавливаем статус
 
-                if (Integer.parseInt(taskArr[0]) > maxId) {
-                    maxId = Integer.parseInt(taskArr[0]);
+                if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
+                    fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
                 }
                 break;
             }
@@ -88,8 +85,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                                 taskArr[4], // добавляем описание
                                 Status.valueOf(taskArr[3]))); // устанавливаем статус
 
-                if (Integer.parseInt(taskArr[0]) > maxId) {
-                    maxId = Integer.parseInt(taskArr[0]);
+                if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
+                    fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
                 }
                 break;
             }
@@ -112,8 +109,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                             " не добавлена, так как не был найден Epic.");
                 }
 
-                if (Integer.parseInt(taskArr[0]) > maxId) {
-                    maxId = Integer.parseInt(taskArr[0]);
+                if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
+                    fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
                 }
                 break;
             }
