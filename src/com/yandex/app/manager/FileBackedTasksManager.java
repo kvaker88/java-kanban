@@ -4,47 +4,38 @@ import com.yandex.app.exceptions.ManagerSaveException;
 import com.yandex.app.task.*;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 public class FileBackedTasksManager extends InMemoryTasksManager {
 
     private static final String HEADER = "id,type,name,status,description,epic\n";
-    private static final Path PATH = Path.of(".\\");
 
-        /* Немного изменил логику передачи задач, чтобы вместе с ними передавались упорядоченные ID.
-        Нужно это для того, чтобы HashMap всегда передавал упорядоченные задачи любого количества на сохранение,
-        чтобы исключить вариант перемешивания ID и чтобы при загрузке он всегда устанавливался больше на единицу.
-        Изменения задели методы groupAllTasksToString и allTasksToString. */
-
-    private String groupAllTasksToString() { // разбил методы для скрытия работы кода
-        Map<Integer, Task> allTasks = new HashMap<>();
-        allTasks.putAll(tasks);
-        allTasks.putAll(epics);
-        allTasks.putAll(subtasks);
-
-        Object[] arr = allTasks.keySet().toArray(); // создаём массив ID по ключам мапы
-        Arrays.sort(arr); // сортируем
-
-        return allTasksToString(List.of(arr), allTasks); // передаём массив и мапу с задачами для записи в String
-
+    File file;
+    public FileBackedTasksManager (File file) {
+        this.file = file; // этот конструктор нужен для метода save()
     }
 
-    private String allTasksToString(List<Object> arr, Map<Integer, Task> allTasks) {
-        StringBuilder tasksString = new StringBuilder();
 
-        for (Object id : arr) {
-            int idToInt = Integer.parseInt(id.toString()); // перезаписываем ID из Object в int
-            tasksString.append(allTasks.get(idToInt).toStringToFile()); // добавляем задачу по полученному ID в строку
+    private String groupAllTasksToString() { // упростил логику обратно, убрал лишние действия
+        StringBuilder allTasksToString = new StringBuilder();
+        for (Task task : tasks.values()) {
+            allTasksToString.append(task.toStringToFile());
         }
-        return tasksString.toString(); // отдаём готовую строку со всеми задачами
+
+        for (Epic epic : epics.values()) {
+            allTasksToString.append(epic.toStringToFile());
+        }
+
+        for (SubTask subTask : subtasks.values()) {
+            allTasksToString.append(subTask.toStringToFile());
+        }
+
+        return allTasksToString.toString(); // отдаём сразу готовую строку
+
     }
 
     private void save() { // метод для сохранения существующих задач всех типов в файл
-        try (Writer fileWriter = new FileWriter(PATH + "\\save.csv", false)) {
+        try (Writer fileWriter = new FileWriter(file, false)) {
             fileWriter.write(HEADER); // дефолтная первая строка с пояснением
             fileWriter.write(groupAllTasksToString());
         } catch (IOException exception) {
@@ -53,7 +44,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
     }
 
     public static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine(); // пропускаем первую строку
@@ -63,7 +54,6 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                 if (!line.equals("")) {
                     addTaskFromFile(line.split(","), fileBackedTasksManager);
                 }
-                fileBackedTasksManager.id = Integer.parseInt(String.valueOf(line.charAt(0))) + 1; // устанавливаем ID последней задачи
             }
             bufferedReader.close();
         } catch (IOException exception) {
@@ -81,6 +71,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                         taskArr[2], // добавляем имя
                         taskArr[4], // добавляем описание
                         Status.valueOf(taskArr[3]))); // устанавливаем статус
+                fileBackedTasksManager.id++;
                 break;
             }
 
@@ -90,6 +81,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                         taskArr[2], // добавляем имя
                         taskArr[4], // добавляем описание
                         Status.valueOf(taskArr[3]))); // устанавливаем статус
+                fileBackedTasksManager.id++;
                 break;
             }
 
@@ -103,8 +95,14 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                 fileBackedTasksManager.subtasks.put(Integer.parseInt(taskArr[0]), subTask);
                 // добавляем подзадачу с айди эпика напрямую в мапу
 
-                fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])).addSubTask(subTask);
-                // добавляем связь между эпиком и подзадачей
+                if (fileBackedTasksManager.epics.containsKey(Integer.parseInt(taskArr[5]))) {
+                    fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])).addSubTask(subTask);
+                    // добавляем связь между эпиком и подзадачей, если эпик существует.
+                } else {
+                    System.out.println("Подзадача с ID" + (Integer.parseInt(taskArr[0])) +
+                            " не добавлена, так как не был найден Epic.");
+                }
+                fileBackedTasksManager.id++;
                 break;
             }
         }

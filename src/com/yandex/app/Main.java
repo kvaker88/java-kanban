@@ -8,15 +8,19 @@ import com.yandex.app.task.SubTask;
 import com.yandex.app.task.Task;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
         // перемененная для последующей загрузки из файла
-        final Path path = Path.of("C:\\Users\\tihon\\IdeaProjects\\java-kanban\\");
-        FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultTasksManager();
+        File file = null;
+        try {
+            file = File.createTempFile("save_", ".csv");
+        } catch (IOException exception) {
+            System.out.println(exception);
+        }
+        FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultTasksManager(file);
 
-        fileBackedTasksManager.loadFromFile(new File(path + "save.csv"));
         System.out.println("Сохранились, загрузили пустой файл ");
 
         // Далее создаём задачи по ТЗ через новый менеджер, автоматически сохраняем в файл
@@ -37,8 +41,7 @@ public class Main {
 
         // Проверяем какие задачи в программе, сверяем с содержимым файла
 
-        FileBackedTasksManager fileBackedTasksManager1 = fileBackedTasksManager
-                .loadFromFile(new File("C:\\Users\\tihon\\IdeaProjects\\java-kanban\\save.csv"));
+        FileBackedTasksManager fileBackedTasksManager1 = fileBackedTasksManager.loadFromFile(file);
 
         System.out.println("Задачи - " + fileBackedTasksManager1.getTasks());
         System.out.println("Эпики - " + fileBackedTasksManager1.getEpics());

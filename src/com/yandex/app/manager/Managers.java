@@ -3,6 +3,8 @@ package com.yandex.app.manager;
 import com.yandex.app.history.HistoryManager;
 import com.yandex.app.history.InMemoryHistoryManager;
 
+import java.io.File;
+
 public class Managers {
 
     public static TasksManager getDefault() {
@@ -13,7 +15,7 @@ public class Managers {
         return new InMemoryHistoryManager();
     }
 
-    public static FileBackedTasksManager getDefaultTasksManager() {
-        return new FileBackedTasksManager();
+    public static FileBackedTasksManager getDefaultTasksManager(File file) {
+        return new FileBackedTasksManager(file);
     }
 }

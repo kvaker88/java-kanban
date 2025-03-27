@@ -1,57 +1,57 @@
 package com.yandex.app.manager;
 
+import com.yandex.app.task.Epic;
+import com.yandex.app.task.Status;
+import com.yandex.app.task.SubTask;
 import com.yandex.app.task.Task;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileBackedTasksManagerTest {
 
-    // тут заранее напишу. Я не понял как использовать "File.createTempFile()" в данном случае. Метод save() создаёт
-    // файл в конкретном месте, не возвращая даже название файла, а для тестов нужен конкретный путь. Можно было бы
-    // чуть поменять логику, но это странно делать только для проведения тестов. Поэтому, в последнем тесте добавил
-    // удаление файла, чтобы не засорять диск.
-
     @Test
     void saveAndLoadEmptyFile() {
-        // не придумал как иначе реализовать тестирование такого случая.
-        // По идее, если файл пуст, никаких задач во второй менеджер добавлено не будет.
+        File file = null;
+        try {
+            file = File.createTempFile("save_", ".csv");
+        } catch (IOException exception) {
+            System.out.println(exception);
+        }
+        FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(file);
+        fileBackedTasksManager1.loadFromFile(file);
 
-        // создаём менеджер, пробуем удалить задачу, чтобы создать файл сохранения. Получаем ответ
-        // "Задача с указанным ID не найдена.", но при этом, файл создаётся.
-        FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager();
-        fileBackedTasksManager1.deleteTasks();
+        Assertions.assertTrue(fileBackedTasksManager1.getTasks().isEmpty());
+        Assertions.assertTrue(fileBackedTasksManager1.getEpics().isEmpty());
+        Assertions.assertTrue(fileBackedTasksManager1.getSubtasks().isEmpty());
 
-        // указываем путь до файла, созхдаём второй менеджер с использованием метода загрузки из ранее созданного файла,
-        // затем все задачи закидываем в одну мапу и сравниваем с пустой мапой.
-        File file = new File(".\\save.csv");
+        fileBackedTasksManager1.addNewTask(new Task(1, "Task", "Description"));
+
         FileBackedTasksManager fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
-
-        Map<Integer, Task> allTasks = new HashMap<>(fileBackedTasksManager2.tasks);
-        allTasks.putAll(fileBackedTasksManager2.tasks);
-        allTasks.putAll(fileBackedTasksManager2.epics);
-        allTasks.putAll(fileBackedTasksManager2.subtasks);
-
-        Map<Integer, Task> emptyMap = new HashMap<>();
-
-        assertEquals(emptyMap, allTasks, "Задачи есть в файле");
+        String taskToString = fileBackedTasksManager2.getTask(1).toStringToFile();
+        assertEquals(taskToString, "1,TASK,Task,NEW,Description\n", "Содержимое не совпадает");
+        file.deleteOnExit();
     }
 
     @Test
     void save() {
+        File file = null;
+        try {
+            file = File.createTempFile("save_", ".csv");
+        } catch (IOException exception) {
+            System.out.println(exception);
+        }
         // создаём менеджер, в который добавляем одну задачу, методом addNewTask создаётся файл save.csv
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
-        Task taskForTestSave = new Task("Task1", "Description task1");
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
+        Task taskForTestSave = new Task(1,"Task1", "Description task1");
         fileBackedTasksManager.addNewTask(taskForTestSave);
         String taskToString = taskForTestSave.toStringToFile();
 
         // читаем содержимое файла с помощью BuffeeredReader, записываем в ранее созданную переменную line
         String line = "";
-        File file = new File(".\\save.csv");
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine(); // пропускаем первую строку
@@ -65,25 +65,43 @@ class FileBackedTasksManagerTest {
         }
         // проверяем, что файл содержит ту информацию, которую мы передавали в save
         assertEquals(taskToString, line, "Содержимое файла не совпадает с задачей");
+        file.deleteOnExit();
     }
 
     @Test
     void loadFromFile() {
-        // создаём менеджер, в который добавляем одну задачу, методом addNewTask создаётся файл save.csv
-        FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager();
-        Task taskForTestLoadFromFile = new Task(1, "TaskForTestLoadFromFile",
-                "Description ForTestLoadFromFile");
-        fileBackedTasksManager1.addNewTask(taskForTestLoadFromFile);
-        Task task1 = fileBackedTasksManager1.tasks.get(1);
+        File file = null;
+        try {
+            file = File.createTempFile("save_", ".csv");
+        } catch (IOException exception) {
+            System.out.println(exception);
+        }
+
+        // Изменил тестирование метода. Вроде каждая задача будет сверена корректно между менеджерами.
+        FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(file);
+
+        Task task = new Task(1, "Task", "Description forTask");
+        Epic epic = new Epic(1, "Epic", "Description forTask");
+        SubTask subTask = new SubTask(1,2,"SubTask", "Description forSubTask", Status.NEW);
+
+        fileBackedTasksManager1.addNewTask(task);
+        fileBackedTasksManager1.addNewEpic(epic);
+        fileBackedTasksManager1.addNewSubtask(2, subTask);
+
+        String taskToString1 = fileBackedTasksManager1.tasks.get(1).toStringToFile();
+        String epicToString1 = fileBackedTasksManager1.epics.get(2).toStringToFile();
+        String subTaskToString1 = fileBackedTasksManager1.subtasks.get(3).toStringToFile();
 
         // указываем путь до файла, создаём второй менеджер с использованием метода загрузки из ранее созданного файла
-        File file = new File(".\\save.csv");
         FileBackedTasksManager fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
-
-        Task task2 = fileBackedTasksManager2.getTask(1);
+        String taskToString2 = fileBackedTasksManager2.getTask(1).toStringToFile();
+        String epicToString2 = fileBackedTasksManager2.getEpic(2).toStringToFile();
+        String subTaskToString2 = fileBackedTasksManager2.getSubtask(3).toStringToFile();
 
         // Проверяем совпадение задач из двух менеджеров
-        assertEquals(task1, task2, "Задача из загруженного файла не совпадает.");
-        file.delete(); // чтоб файл лишний не оставался после теста
+        assertEquals(taskToString1, taskToString2, "Задача из загруженного файла не совпадает.");
+        assertEquals(epicToString1, epicToString2, "Эпик из загруженного файла не совпадает.");
+        assertEquals(subTaskToString1, subTaskToString2, "Подзадача из загруженного файла не совпадает.");
+        file.deleteOnExit();
     }
 }

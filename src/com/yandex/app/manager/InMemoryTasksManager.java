@@ -19,8 +19,7 @@ public class InMemoryTasksManager implements TasksManager {
     @Override
     public int addNewTask(Task task) {
         task.setId(id);
-        tasks.put(id, task); // Добавляем задачу в Map
-        id++;
+        tasks.put(id++, task); // Добавляем задачу в Map
         return task.getId(); // Возвращаем ID добавленной задачи
     }
 
