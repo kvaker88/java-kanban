@@ -4,20 +4,21 @@ import com.yandex.app.exceptions.ManagerSaveException;
 import com.yandex.app.task.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 
 public class FileBackedTasksManager extends InMemoryTasksManager {
 
-    private static final String HEADER = "id,type,name,status,description,epic\n";
+    private static final String HEADER = "id,type,name,status,description,epic,startTime,duration\n";
 
     File file;
 
     public FileBackedTasksManager(File file) {
-        this.file = file; // этот конструктор нужен для метода save()
+        this.file = file;
     }
 
-
-    private String groupAllTasksToString() { // упростил логику обратно, убрал лишние действия
+    private String groupAllTasksToString() {
         StringBuilder allTasksToString = new StringBuilder();
         for (Task task : tasks.values()) {
             allTasksToString.append(task.toStringToFile());
@@ -31,13 +32,13 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
             allTasksToString.append(subTask.toStringToFile());
         }
 
-        return allTasksToString.toString(); // отдаём сразу готовую строку
+        return allTasksToString.toString();
 
     }
 
-    private void save() { // метод для сохранения существующих задач всех типов в файл
+    private void save() {
         try (Writer fileWriter = new FileWriter(file, false)) {
-            fileWriter.write(HEADER); // дефолтная первая строка с пояснением
+            fileWriter.write(HEADER);
             fileWriter.write(groupAllTasksToString());
         } catch (IOException exception) {
             throw new ManagerSaveException("Не удалось записать файл.");
@@ -48,7 +49,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            bufferedReader.readLine(); // пропускаем первую строку
+            bufferedReader.readLine();
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 if (!line.equals("")) {
@@ -63,14 +64,28 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
     }
 
     private static void addTaskFromFile(String[] taskArr, FileBackedTasksManager fileBackedTasksManager) {
-        // текущий метод создаёт пустые задачи нужного типа по первому индексу каждой строки файла
         switch (Type.valueOf(taskArr[1])) {
             case TASK: {
-                fileBackedTasksManager.tasks.put(Integer.parseInt(taskArr[0]), // добавляем задачу напрямую в мапу
-                        new Task(Integer.parseInt(taskArr[0]), // добавляем айди задачи
-                                taskArr[2], // добавляем имя
-                                taskArr[4], // добавляем описание
-                                Status.valueOf(taskArr[3]))); // устанавливаем статус
+                Task task;
+                if (taskArr[5].equals("null")) {
+                    task = new Task(
+                            Integer.parseInt(taskArr[0]),
+                            taskArr[2],
+                            taskArr[4],
+                            Status.valueOf(taskArr[3])
+                    );
+                } else {
+                    task = new Task(
+                            Integer.parseInt(taskArr[0]),
+                            taskArr[2],
+                            taskArr[4],
+                            Status.valueOf(taskArr[3]),
+                            Duration.parse(taskArr[6]),
+                            LocalDateTime.parse(taskArr[5])
+                    );
+                    fileBackedTasksManager.tasksByPriority.add(task);
+                }
+                fileBackedTasksManager.tasks.put(Integer.parseInt(taskArr[0]), task);
 
                 if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
                     fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
@@ -79,12 +94,23 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
             }
 
             case EPIC: {
-                fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]), // добавляем задачу напрямую в мапу
-                        new Epic(Integer.parseInt(taskArr[0]), // добавляем айди задачи
-                                taskArr[2], // добавляем имя
-                                taskArr[4], // добавляем описание
-                                Status.valueOf(taskArr[3]))); // устанавливаем статус
-
+                if (taskArr[5].equals("null")) {
+                    fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]),
+                            new Epic(Integer.parseInt(taskArr[0]),
+                                    taskArr[2],
+                                    taskArr[4],
+                                    Status.valueOf(taskArr[3])
+                            ));
+                } else {
+                    fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]),
+                            new Epic(Integer.parseInt(taskArr[0]),
+                                    taskArr[2],
+                                    taskArr[4],
+                                    Status.valueOf(taskArr[3]),
+                                    Duration.parse(taskArr[6]),
+                                    LocalDateTime.parse(taskArr[5])
+                            ));
+                }
                 if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
                     fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
                 }
@@ -92,20 +118,33 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
             }
 
             case SUBTASK: {
-                SubTask subTask = new SubTask(Integer.parseInt(taskArr[0]), // добавляем айди задачи
-                        Integer.parseInt(taskArr[5]), // ещё раз добвляем айди эпика
-                        taskArr[2], // добавляем имя
-                        taskArr[4], // добавляем описание
-                        Status.valueOf(taskArr[3]));// устанавливаем статус
-
+                SubTask subTask;
+                if (taskArr[6].equals("null")) {
+                    subTask = new SubTask(
+                            Integer.parseInt(taskArr[0]),
+                            Integer.parseInt(taskArr[5]),
+                            taskArr[2],
+                            taskArr[4],
+                            Status.valueOf(taskArr[3])
+                    );
+                } else {
+                    subTask = new SubTask(
+                            Integer.parseInt(taskArr[0]),
+                            Integer.parseInt(taskArr[5]),
+                            taskArr[2],
+                            taskArr[4],
+                            Status.valueOf(taskArr[3]),
+                            Duration.parse(taskArr[7]),
+                            LocalDateTime.parse(taskArr[6])
+                    );
+                    fileBackedTasksManager.tasksByPriority.add(subTask);
+                }
                 fileBackedTasksManager.subtasks.put(Integer.parseInt(taskArr[0]), subTask);
-                // добавляем подзадачу с айди эпика напрямую в мапу
 
                 if (fileBackedTasksManager.epics.containsKey(Integer.parseInt(taskArr[5]))) {
                     fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])).addSubTask(subTask);
-                    // добавляем связь между эпиком и подзадачей, если эпик существует.
                 } else {
-                    System.out.println("Подзадача с ID" + (Integer.parseInt(taskArr[0])) +
+                    System.out.println("Подзадача с ID " + (Integer.parseInt(taskArr[0])) +
                             " не добавлена, так как не был найден Epic.");
                 }
 

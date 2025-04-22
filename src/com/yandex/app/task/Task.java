@@ -1,33 +1,77 @@
 package com.yandex.app.task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-// класс для выполнения действий с обычными задачами
 public class Task {
-    protected int id; // айди
-    protected String name; // имя
-    protected String description; // описание
+    protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+    protected int id;
+    protected String name;
+    protected String description;
     protected Status status = Status.NEW;
-    protected Type type = Type.TASK; // задаём по дефолту тип TASK для обычных задач
+    protected Type type = Type.TASK;
+    protected Duration duration = Duration.ofMinutes(0);
+    protected LocalDateTime startTime = null;
 
-    // конструтор для изменения существующей задачи, без статуса
-    public Task(int id, String name, String description) {
+    public Task(
+            String name,
+            String description
+    ) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Task(
+            int id,
+            String name,
+            String description
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
 
-    // конструтор для изменения существующей задачи, включая статус
-    public Task(int id, String name, String description, Status stat) {
+    public Task(
+            int id,
+            String name,
+            String description,
+            Status status
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.status = stat;
+        this.status = status;
     }
 
-    public Task(String name, String description) { // конструктор для создания новой задачи
+    public Task(
+            String name,
+            String description,
+            Duration duration,
+            LocalDateTime startTime
+    ) {
         this.name = name;
         this.description = description;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(
+            int id,
+            String name,
+            String description,
+            Status status,
+            Duration duration,
+            LocalDateTime startTime
+    ) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public int getId() {
@@ -46,6 +90,18 @@ public class Task {
         return status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -62,13 +118,12 @@ public class Task {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "Задача {" +
-                "ID:" + id +
-                ", Название: " + name +
-                ", Описание: " + description +
-                ", Статус:" + status + "}";
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     @Override
@@ -84,7 +139,36 @@ public class Task {
         return Objects.hashCode(id);
     }
 
+    @Override
+    public String toString() {
+        String result = "";
+        if (startTime != null) {
+            result = "Задача {" +
+                    "ID:" + id +
+                    ", Название: " + name +
+                    ", Описание: " + description +
+                    ", Статус:" + status +
+                    ", Дата и время начала: " + startTime.format(DATE_TIME_FORMATTER) +
+                    ", Время выполнения: " + duration + "}";
+        } else {
+            result = "Задача {" +
+                    "ID:" + id +
+                    ", Название: " + name +
+                    ", Описание: " + description +
+                    ", Статус:" + status +
+                    ", Дата и время начал: Не указаны" +
+                    ", Время выполнения: Не указано}";
+        }
+        return result;
+    }
+
     public String toStringToFile() { // метод на подобии toString, только для сохранения задачи в файл
-        return id + "," + type + "," + name + "," + status + "," + description + "\n";
+        return id + "," +
+                type + "," +
+                name + "," +
+                status + "," +
+                description + "," +
+                startTime + "," +
+                duration + "\n";
     }
 }

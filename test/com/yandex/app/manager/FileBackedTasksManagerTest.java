@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FileBackedTasksManagerTest {
+class FileBackedTasksManagerTest extends TasksManagerTest<FileBackedTasksManager> {
 
     @Test
     void saveAndLoadEmptyFile() throws IOException {
@@ -23,50 +25,79 @@ class FileBackedTasksManagerTest {
         Assertions.assertTrue(fileBackedTasksManager1.getEpics().isEmpty());
         Assertions.assertTrue(fileBackedTasksManager1.getSubtasks().isEmpty());
 
-        fileBackedTasksManager1.addNewTask(new Task(1, "Task", "Description"));
+        fileBackedTasksManager1.addNewTask(new Task(
+                1,
+                "Task saveAndLoadEmptyFile",
+                "saveAndLoadEmptyFile Description",
+                Status.IN_PROGRESS,
+                Duration.ofMinutes(15),
+                LocalDateTime.of(1970,1,1,0,0)
+        ));
 
         FileBackedTasksManager fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
         String taskToString = fileBackedTasksManager2.getTask(1).toStringToFile();
-        assertEquals(taskToString, "1,TASK,Task,NEW,Description\n", "Содержимое не совпадает");
+        assertEquals(taskToString,
+                "1," +
+                        "TASK," +
+                        "Task saveAndLoadEmptyFile," +
+                        "IN_PROGRESS," +
+                        "saveAndLoadEmptyFile Description," +
+                        "1970-01-01T00:00," +
+                        "PT15M\n",
+                "Содержимое не совпадает");
     }
 
     @Test
     void save() throws IOException {
         File file = File.createTempFile("save_", ".csv");
 
-        // создаём менеджер, в который добавляем одну задачу, методом addNewTask создаётся файл save.csv
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
-        Task taskForTestSave = new Task(1,"Task1", "Description task1");
+        Task taskForTestSave = new Task(
+                1,
+                "Task save",
+                "save Description"
+        );
         fileBackedTasksManager.addNewTask(taskForTestSave);
         String taskToString = taskForTestSave.toStringToFile();
 
-        // читаем содержимое файла с помощью BuffeeredReader, записываем в ранее созданную переменную line
         String line = "";
         try (Reader fileReader = new FileReader(file)) {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            bufferedReader.readLine(); // пропускаем первую строку
+            bufferedReader.readLine();
 
             line = bufferedReader.readLine() + "\n";
-            // добавляем перенос строки, так как task.toStringToFile()
-            // тоже это делает и разница в переносах не даст пройти тесту
-            bufferedReader.close(); // закрываем чтение
+            bufferedReader.close();
         } catch (IOException exception) {
             System.out.println("Не удалось прочитать файл.");
         }
-        // проверяем, что файл содержит ту информацию, которую мы передавали в save
+
         assertEquals(taskToString, line, "Содержимое файла не совпадает с задачей");
     }
 
     @Test
     void loadFromFile() throws IOException {
         File file = File.createTempFile("save_", ".csv");
-
-        // Изменил тестирование метода. Вроде каждая задача будет сверена корректно между менеджерами.
         FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(file);
 
-        Task task = new Task(1, "Task", "Description forTask");
-        Epic epic = new Epic(1, "Epic", "Description forTask");
-        SubTask subTask = new SubTask(1,2,"SubTask", "Description forSubTask", Status.NEW);
+        Task task = new Task(
+                1,
+                "Task loadFromFile",
+                "loadFromFile Description"
+        );
+
+        Epic epic = new Epic(
+                1,
+                "Epic loadFromFile",
+                "loadFromFile Description"
+        );
+
+        SubTask subTask = new SubTask(
+                1,
+                2,
+                "SubTask loadFromFile",
+                "loadFromFile Description",
+                Status.NEW
+        );
 
         fileBackedTasksManager1.addNewTask(task);
         fileBackedTasksManager1.addNewEpic(epic);
@@ -88,6 +119,6 @@ class FileBackedTasksManagerTest {
         assertEquals(taskToString1, taskToString2, "Задача из загруженного файла не совпадает.");
         assertEquals(epicToString1, epicToString2, "Эпик из загруженного файла не совпадает.");
         assertEquals(subTaskToString1, subTaskToString2, "Подзадача из загруженного файла не совпадает.");
-        assertEquals(epicSubTasksToString1, epicSubTasksToString2,"Подзадачи у эпика не совпадают.");
+        assertEquals(epicSubTasksToString1, epicSubTasksToString2, "Подзадачи у эпика не совпадают.");
     }
 }

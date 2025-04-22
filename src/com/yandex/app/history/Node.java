@@ -13,7 +13,6 @@ public class Node {
         this.prev = prev;
     }
 
-    // Методы ниже нужны для упрощения взаимодействия в методе InMemoryHistoryManager.remove(id)
     public Node getNext() {
         return next;
     }
