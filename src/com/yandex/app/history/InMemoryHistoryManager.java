@@ -6,7 +6,7 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final Map<Integer, Node> history = new HashMap<>(); // История просмотров задач
+    private final Map<Integer, Node> history = new HashMap<>();
     private Node tail;
     private Node head;
 
@@ -16,7 +16,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
         if (history.containsKey(task.getId())) {
-            remove(task.getId()); // Удаляем существующую задачу
+            remove(task.getId());
         }
 
         Node oldTail = tail;
