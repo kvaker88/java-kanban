@@ -37,7 +37,7 @@ public class Main {
         SubTask subTask = new SubTask(
                 3,
                 2,
-                "Sub Task1",
+                "Sub Task2",
                 "Description sub task3",
                 Status.IN_PROGRESS,
                 Duration.ofMinutes(30),
@@ -47,7 +47,7 @@ public class Main {
         SubTask subTask2 = new SubTask(
                 4,
                 2,
-                "Sub Task2",
+                "Sub Task4",
                 "Description sub task4",
                 Status.IN_PROGRESS,
                 Duration.ofMinutes(30),
@@ -64,7 +64,7 @@ public class Main {
 
         fileBackedTasksManager.updateSubtask(new SubTask(3,
                 2,
-                "Sub Task22",
+                "Sub Task3",
                 "Description sub task3",
                 Status.DONE,
                 Duration.ofMinutes(30),

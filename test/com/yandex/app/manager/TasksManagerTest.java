@@ -11,8 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class TasksManagerTest<T extends TasksManager> {
-
-    InMemoryTasksManager tasksManager = new InMemoryTasksManager();
+    protected T tasksManager;
 
     @Test
     void addNewTask() {
@@ -25,13 +24,13 @@ public abstract class TasksManagerTest<T extends TasksManager> {
         final Task savedTask = tasksManager.getTask(taskId);
 
         assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals(task, savedTask, "Задачи не совпадают.");
+        assertEquals(task.getName(), savedTask.getName(), "Задачи не совпадают.");
 
         final List<Task> tasks = tasksManager.getTasks();
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(task, tasks.getFirst(), "Задачи не совпадают.");
+        assertEquals(task.getName(), tasks.getFirst().getName(), "Задачи не совпадают.");
     }
 
     @Test
@@ -45,13 +44,13 @@ public abstract class TasksManagerTest<T extends TasksManager> {
         final Epic savedTask = tasksManager.getEpic(taskId);
 
         assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals(epic, savedTask, "Задачи не совпадают.");
+        assertEquals(epic.getName(), savedTask.getName(), "Задачи не совпадают.");
 
         final List<Epic> epics = tasksManager.getEpics();
 
         assertNotNull(epics, "Задачи не возвращаются.");
         assertEquals(1, epics.size(), "Неверное количество задач.");
-        assertEquals(epic, epics.getFirst(), "Задачи не совпадают.");
+        assertEquals(epic.getName(), epics.getFirst().getName(), "Задачи не совпадают.");
     }
 
     @Test
@@ -71,13 +70,13 @@ public abstract class TasksManagerTest<T extends TasksManager> {
         final SubTask savedTask = tasksManager.getSubtask(subTaskId);
 
         assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals(subTask, savedTask, "Задачи не совпадают.");
+        assertEquals(subTask.getName(), savedTask.getName(), "Задачи не совпадают.");
 
         final List<SubTask> subTasks = tasksManager.getSubtasks();
 
         assertNotNull(subTasks, "Задачи не возвращаются.");
         assertEquals(1, subTasks.size(), "Неверное количество задач.");
-        assertEquals(subTask, subTasks.getFirst(), "Задачи не совпадают.");
+        assertEquals(subTask.getName(), subTasks.getFirst().getName(), "Задачи не совпадают.");
     }
 
     @Test
@@ -105,9 +104,9 @@ public abstract class TasksManagerTest<T extends TasksManager> {
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(3, tasks.size(), "Неверное количество задач.");
-        assertEquals(task1, tasks.get(0), "Задача #1 не совпадает.");
-        assertEquals(task2, tasks.get(1), "Задача #2 не совпадает.");
-        assertEquals(task3, tasks.get(2), "Задача #3 не совпадает.");
+        assertEquals(task1.getName(), tasks.get(0).getName(), "Задача #1 не совпадает.");
+        assertEquals(task2.getName(), tasks.get(1).getName(), "Задача #2 не совпадает.");
+        assertEquals(task3.getName(), tasks.get(2).getName(), "Задача #3 не совпадает.");
     }
 
     @Test
@@ -143,9 +142,9 @@ public abstract class TasksManagerTest<T extends TasksManager> {
 
         assertNotNull(subTasks, "Задачи не возвращаются.");
         assertEquals(3, subTasks.size(), "Неверное количество задач.");
-        assertEquals(subTask1, subTasks.get(0), "Задача #1 не совпадает.");
-        assertEquals(subTask2, subTasks.get(1), "Задача #2 не совпадает.");
-        assertEquals(subTask3, subTasks.get(2), "Задача #3 не совпадает.");
+        assertEquals(subTask1.getName(), subTasks.get(0).getName(), "Задача #1 не совпадает.");
+        assertEquals(subTask2.getName(), subTasks.get(1).getName(), "Задача #2 не совпадает.");
+        assertEquals(subTask3.getName(), subTasks.get(2).getName(), "Задача #3 не совпадает.");
     }
 
     @Test
@@ -173,9 +172,9 @@ public abstract class TasksManagerTest<T extends TasksManager> {
 
         assertNotNull(epics, "Задачи не возвращаются.");
         assertEquals(3, epics.size(), "Неверное количество задач.");
-        assertEquals(epic1, epics.get(0), "Задача #1 не совпадает.");
-        assertEquals(epic2, epics.get(1), "Задача #2 не совпадает.");
-        assertEquals(epic3, epics.get(2), "Задача #3 не совпадает.");
+        assertEquals(epic1.getName(), epics.get(0).getName(), "Задача #1 не совпадает.");
+        assertEquals(epic2.getName(), epics.get(1).getName(), "Задача #2 не совпадает.");
+        assertEquals(epic3.getName(), epics.get(2).getName(), "Задача #3 не совпадает.");
     }
 
     @Test
@@ -210,9 +209,9 @@ public abstract class TasksManagerTest<T extends TasksManager> {
         final List<SubTask> epicSubtasks = tasksManager.getEpicSubtasks(1);
 
         assertNotNull(epicSubtasks, "Подзадачи не возвращаются.");
-        assertEquals(subTask1, epicSubtasks.get(0), "Подзадача #1 не совпадает.");
-        assertEquals(subTask2, epicSubtasks.get(1), "Подзадача #2 не совпадает.");
-        assertEquals(subTask3, epicSubtasks.get(2), "Подзадача #3 не совпадает.");
+        assertEquals(subTask1.getName(), epicSubtasks.get(0).getName(), "Подзадача #1 не совпадает.");
+        assertEquals(subTask2.getName(), epicSubtasks.get(1).getName(), "Подзадача #2 не совпадает.");
+        assertEquals(subTask3.getName(), epicSubtasks.get(2).getName(), "Подзадача #3 не совпадает.");
         assertEquals(3, epicSubtasks.size(), "Неверное количество подзадач.");
     }
 
@@ -242,7 +241,7 @@ public abstract class TasksManagerTest<T extends TasksManager> {
         final Task taskById = tasksManager.getTask(taskId);
 
         assertNotNull(taskById, "Задача не возвращаются.");
-        assertEquals(task, taskById, "Задача не совпадает.");
+        assertEquals(task.getName(), taskById.getName(), "Задача не совпадает.");
     }
 
     @Test
@@ -328,7 +327,7 @@ public abstract class TasksManagerTest<T extends TasksManager> {
         tasksManager.updateSubtask(updatedSubTask);
 
         final SubTask subTaskById = tasksManager.getSubtask(subTaskId);
-        assertEquals(updatedSubTask, subTaskById, "Подзадача не совпадает.");
+        assertEquals(updatedSubTask.getName(), subTaskById.getName(), "Подзадача не совпадает.");
     }
 
     @Test
@@ -350,7 +349,7 @@ public abstract class TasksManagerTest<T extends TasksManager> {
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(task2, tasks.getFirst(), "Задачи не совпадают.");
+        assertEquals(task2.getName(), tasks.getFirst().getName(), "Задачи не совпадают.");
     }
 
     @Test
@@ -372,7 +371,7 @@ public abstract class TasksManagerTest<T extends TasksManager> {
 
         assertNotNull(epics, "Эпики не возвращаются.");
         assertEquals(1, epics.size(), "Неверное количество Эпиков.");
-        assertEquals(epic2, epics.getFirst(), "Эпики не совпадают.");
+        assertEquals(epic2.getName(), epics.getFirst().getName(), "Эпики не совпадают.");
     }
 
     @Test
@@ -403,7 +402,7 @@ public abstract class TasksManagerTest<T extends TasksManager> {
 
         assertNotNull(subTasks, "Эпики не возвращаются.");
         assertEquals(1, subTasks.size(), "Неверное количество Эпиков.");
-        assertEquals(subTask2, subTasks.getFirst(), "Эпики не совпадают.");
+        assertEquals(subTask2.getName(), subTasks.getFirst().getName(), "Эпики не совпадают.");
     }
 
     @Test

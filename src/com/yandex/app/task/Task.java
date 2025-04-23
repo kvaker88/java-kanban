@@ -168,6 +168,7 @@ public class Task {
                 name + "," +
                 status + "," +
                 description + "," +
+                "" + "," +
                 startTime + "," +
                 duration + "\n";
     }

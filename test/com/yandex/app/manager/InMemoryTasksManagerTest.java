@@ -4,6 +4,7 @@ import com.yandex.app.task.Epic;
 import com.yandex.app.task.Status;
 import com.yandex.app.task.SubTask;
 import com.yandex.app.task.Task;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -14,7 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
 
-    InMemoryTasksManager tasksManager = new InMemoryTasksManager();
+    @BeforeEach
+    public void setUp() {
+        tasksManager = new InMemoryTasksManager();
+    }
 
     @Test
     void updateEpicStatus() {

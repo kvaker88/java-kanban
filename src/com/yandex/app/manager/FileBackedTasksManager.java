@@ -67,7 +67,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         switch (Type.valueOf(taskArr[1])) {
             case TASK: {
                 Task task;
-                if (taskArr[5].equals("null")) {
+                if (taskArr[6].equals("null")) {
                     task = new Task(
                             Integer.parseInt(taskArr[0]),
                             taskArr[2],
@@ -80,8 +80,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                             taskArr[2],
                             taskArr[4],
                             Status.valueOf(taskArr[3]),
-                            Duration.parse(taskArr[6]),
-                            LocalDateTime.parse(taskArr[5])
+                            Duration.parse(taskArr[7]),
+                            LocalDateTime.parse(taskArr[6])
                     );
                     fileBackedTasksManager.tasksByPriority.add(task);
                 }
@@ -94,7 +94,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
             }
 
             case EPIC: {
-                if (taskArr[5].equals("null")) {
+                if (taskArr[6].equals("null")) {
                     fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]),
                             new Epic(Integer.parseInt(taskArr[0]),
                                     taskArr[2],
@@ -102,14 +102,15 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                                     Status.valueOf(taskArr[3])
                             ));
                 } else {
-                    fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]),
-                            new Epic(Integer.parseInt(taskArr[0]),
-                                    taskArr[2],
-                                    taskArr[4],
-                                    Status.valueOf(taskArr[3]),
-                                    Duration.parse(taskArr[6]),
-                                    LocalDateTime.parse(taskArr[5])
-                            ));
+                    Epic epic = new Epic(Integer.parseInt(taskArr[0]),
+                            taskArr[2],
+                            taskArr[4],
+                            Status.valueOf(taskArr[3]),
+                            Duration.parse(taskArr[7]),
+                            LocalDateTime.parse(taskArr[6])
+                    );
+                    fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]), epic);
+                    fileBackedTasksManager.updateEpicStartAndEndTime(epic);
                 }
                 if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
                     fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
@@ -143,6 +144,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
 
                 if (fileBackedTasksManager.epics.containsKey(Integer.parseInt(taskArr[5]))) {
                     fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])).addSubTask(subTask);
+                    fileBackedTasksManager.updateEpicStartAndEndTime(
+                            fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])));
                 } else {
                     System.out.println("Подзадача с ID " + (Integer.parseInt(taskArr[0])) +
                             " не добавлена, так как не был найден Epic.");

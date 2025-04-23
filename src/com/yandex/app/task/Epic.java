@@ -10,6 +10,7 @@ public class Epic extends Task {
     private Type type = Type.EPIC;
     private LocalDateTime endTime;
 
+
     public Epic(
             int id,
             String name,
@@ -125,6 +126,7 @@ public class Epic extends Task {
                 name + "," +
                 status + "," +
                 description + "," +
+                "" + "," +
                 startTime + "," +
                 duration + "\n";
     }
