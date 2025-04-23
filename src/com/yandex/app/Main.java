@@ -68,7 +68,7 @@ public class Main {
                 "Description sub task3",
                 Status.DONE,
                 Duration.ofMinutes(30),
-                LocalDateTime.of(2025,4,22,18,0)
+                null
         ));
 
         System.out.println("Задачи - " + fileBackedTasksManager.getTasks());

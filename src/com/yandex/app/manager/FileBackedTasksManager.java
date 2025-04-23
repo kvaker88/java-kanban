@@ -60,6 +60,9 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         } catch (IOException exception) {
             System.out.println("Не удалось прочитать файл.");
         }
+        for (Epic epic : fileBackedTasksManager.epics.values()) {
+            fileBackedTasksManager.updateEpicStartAndEndTime(epic);
+        }
         return fileBackedTasksManager;
     }
 
@@ -110,7 +113,6 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
                             LocalDateTime.parse(taskArr[6])
                     );
                     fileBackedTasksManager.epics.put(Integer.parseInt(taskArr[0]), epic);
-                    fileBackedTasksManager.updateEpicStartAndEndTime(epic);
                 }
                 if (Integer.parseInt(taskArr[0]) > fileBackedTasksManager.id) {
                     fileBackedTasksManager.id = Integer.parseInt(taskArr[0]);
@@ -144,8 +146,6 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
 
                 if (fileBackedTasksManager.epics.containsKey(Integer.parseInt(taskArr[5]))) {
                     fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])).addSubTask(subTask);
-                    fileBackedTasksManager.updateEpicStartAndEndTime(
-                            fileBackedTasksManager.epics.get(Integer.parseInt(taskArr[5])));
                 } else {
                     System.out.println("Подзадача с ID " + (Integer.parseInt(taskArr[0])) +
                             " не добавлена, так как не был найден Epic.");
