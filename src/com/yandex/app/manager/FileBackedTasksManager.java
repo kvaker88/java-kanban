@@ -1,6 +1,6 @@
 package com.yandex.app.manager;
 
-import com.yandex.app.exceptions.ManagerSaveException;
+import com.yandex.app.exception.ManagerSaveException;
 import com.yandex.app.task.*;
 
 import java.io.*;

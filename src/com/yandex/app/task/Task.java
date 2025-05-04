@@ -12,9 +12,9 @@ public class Task {
     protected String name;
     protected String description;
     protected Status status = Status.NEW;
-    protected Type type = Type.TASK;
+    protected Type type;
     protected Duration duration = Duration.ofMinutes(0);
-    protected LocalDateTime startTime = null;
+    protected LocalDateTime startTime;
 
     public Task(
             String name,
@@ -22,6 +22,7 @@ public class Task {
     ) {
         this.name = name;
         this.description = description;
+        type = Type.TASK;
     }
 
     public Task(
@@ -32,6 +33,7 @@ public class Task {
         this.id = id;
         this.name = name;
         this.description = description;
+        type = Type.TASK;
     }
 
     public Task(
@@ -44,6 +46,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = status;
+        type = Type.TASK;
     }
 
     public Task(
@@ -56,6 +59,7 @@ public class Task {
         this.description = description;
         this.duration = duration;
         this.startTime = startTime;
+        type = Type.TASK;
     }
 
     public Task(
@@ -72,6 +76,7 @@ public class Task {
         this.status = status;
         this.duration = duration;
         this.startTime = startTime;
+        type = Type.TASK;
     }
 
     public int getId() {
@@ -92,6 +97,10 @@ public class Task {
 
     public Duration getDuration() {
         return duration;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public LocalDateTime getStartTime() {

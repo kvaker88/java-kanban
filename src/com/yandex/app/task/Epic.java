@@ -7,9 +7,7 @@ import java.util.List;
 
 public class Epic extends Task {
     private final List<SubTask> subtasks = new ArrayList<>();
-    private Type type = Type.EPIC;
     private LocalDateTime endTime;
-
 
     public Epic(
             int id,
@@ -17,6 +15,7 @@ public class Epic extends Task {
             String description
     ) {
         super(id, name, description);
+        type = Type.EPIC;
     }
 
     public Epic(
@@ -24,6 +23,7 @@ public class Epic extends Task {
             String description
     ) {
         super(name, description);
+        type = Type.EPIC;
     }
 
     public Epic(
@@ -35,6 +35,7 @@ public class Epic extends Task {
     ) {
         super(name, description, duration, startTime);
         this.id = id;
+        type = Type.EPIC;
     }
 
     public Epic(
@@ -44,6 +45,7 @@ public class Epic extends Task {
             LocalDateTime startTime
     ) {
         super(name, description, duration, startTime);
+        type = Type.EPIC;
     }
 
     public Epic(
@@ -53,6 +55,7 @@ public class Epic extends Task {
             Status status
     ) {
         super(id, name, description, status);
+        type = Type.EPIC;
     }
 
     public Epic(
@@ -64,7 +67,9 @@ public class Epic extends Task {
             LocalDateTime startTime
     ) {
         super(id, name, description, status, duration, startTime);
+        type = Type.EPIC;
     }
+
 
     public void addSubTask(SubTask subTask) {
         subtasks.add(subTask);

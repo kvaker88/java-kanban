@@ -90,7 +90,7 @@ class InMemoryHistoryManagerTest {
                 )));
 
         final List<Task> history1 = tasksManager.getHistory();
-        assertEquals(0, history1.size());
+        assertEquals(0, history1.size(), "Количество задач не совпадает #1 в addAndGetHistory()");
 
         tasksManager.getTask(2);
         tasksManager.getTask(3);
@@ -100,7 +100,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(11);
 
         final List<Task> history2 = tasksManager.getHistory();
-        assertEquals(5, history2.size());
+        assertEquals(5, history2.size(), "Количество задач не совпадает #2 в addAndGetHistory()");
 
         tasksManager.getTask(1);
         tasksManager.getTask(4);
@@ -108,13 +108,13 @@ class InMemoryHistoryManagerTest {
         tasksManager.getEpic(8);
 
         final List<Task> history3 = tasksManager.getHistory();
-        assertEquals(9, history3.size());
+        assertEquals(9, history3.size(), "Количество задач не совпадает #3 в addAndGetHistory()");
 
         tasksManager.getSubtask(13);
         tasksManager.getSubtask(14);
 
         final List<Task> history4 = tasksManager.getHistory();
-        assertEquals(11, history4.size());
+        assertEquals(11, history4.size(), "Количество задач не совпадает #4 в addAndGetHistory()");
 
         tasksManager.getTask(5);
         tasksManager.getEpic(10);
@@ -123,7 +123,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(15);
 
         final List<Task> history5 = tasksManager.getHistory();
-        assertEquals(15, history5.size());
+        assertEquals(15, history5.size(), "Количество задач не совпадает #5 в addAndGetHistory()");
 
         tasksManager.getTask(5);
         tasksManager.getTask(1);
@@ -134,7 +134,7 @@ class InMemoryHistoryManagerTest {
         tasksManager.getSubtask(11);
         tasksManager.getSubtask(12);
 
-        assertEquals(15, history5.size());
+        assertEquals(15, history5.size(), "Количество задач не совпадает #6 в addAndGetHistory()");
     }
 
     @Test
@@ -231,7 +231,7 @@ class InMemoryHistoryManagerTest {
                 task9 + "]";
 
         assertEquals(7, history.size());
-        assertEquals(taskForTest, tasksManager.getHistory(), "Задача не совпадают.");
-        assertEquals(correctOrder, result, "Задача не совпадают.");
+        assertEquals(taskForTest, tasksManager.getHistory(), "Задача не совпадают в removeHistory()");
+        assertEquals(correctOrder, result, "Задача не совпадают в removeHistory()");
     }
 }
