@@ -1,5 +1,6 @@
 package com.yandex.app.manager;
 
+import com.yandex.app.DefaultTasksTest;
 import com.yandex.app.task.Epic;
 import com.yandex.app.task.Status;
 import com.yandex.app.task.SubTask;
@@ -9,11 +10,13 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
+    DefaultTasksTest defaultTasksTest = new DefaultTasksTest();
 
     @BeforeEach
     public void setUp() {
@@ -43,7 +46,7 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
                 )));
 
         assertEquals(Status.NEW, tasksManager.getEpic(1).getStatus(),
-                "Ошибка при сравнивании с подзадачами в статусе NEW.");
+                "Ошибка при сравнивании с подзадачами в статусе NEW в updateEpicStatus()");
 
         tasksManager.updateSubtask(new SubTask(
                 2,
@@ -60,7 +63,7 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
                 Status.DONE
         ));
         assertEquals(Status.DONE, tasksManager.getEpic(1).getStatus(),
-                "Ошибка при сравнивании с подзадачами в статусе DONE.");
+                "Ошибка при сравнивании с подзадачами в статусе DONE в updateEpicStatus()");
 
         tasksManager.updateSubtask(new SubTask(
                 2,
@@ -77,7 +80,7 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
                 Status.DONE
         ));
         assertEquals(Status.IN_PROGRESS, tasksManager.getEpic(1).getStatus(),
-                "Ошибка при сравнивании с подзадачами в статусе NEW и DONE.");
+                "Ошибка при сравнивании с подзадачами в статусе NEW и DONE в updateEpicStatus()");
 
         tasksManager.updateSubtask(new SubTask(
                 2,
@@ -94,7 +97,7 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
                 Status.IN_PROGRESS
         ));
         assertEquals(Status.IN_PROGRESS, tasksManager.getEpic(1).getStatus(),
-                "Ошибка при сравнивании с подзадачами в статусе IN_PROGRESS.");
+                "Ошибка при сравнивании с подзадачами в статусе IN_PROGRESS в updateEpicStatus()");
     }
 
     @Test
@@ -128,7 +131,7 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
                 )));
 
         assertEquals(Duration.ofMinutes(30), tasksManager.getEpic(1).getDuration(),
-                "Длительность у эпика задана некорректно.");
+                "Длительность у эпика задана некорректно в updateEpicDuration()");
     }
 
     @Test
@@ -163,10 +166,10 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
 
         assertEquals(LocalDateTime.of(1970, 1, 1, 0, 0),
                 tasksManager.getEpic(1).getStartTime(),
-                "Дата начала эпика задана некорректно.");
+                "Дата начала эпика задана некорректно в updateEpicStartAndEndTime()");
         assertEquals(LocalDateTime.of(1970, 1, 1, 0, 50),
                 tasksManager.getEpic(1).getEndTime(),
-                "Дата окончания эпика задана некорректно.");
+                "Дата окончания эпика задана некорректно в updateEpicStartAndEndTime()");
     }
 
     @Test
@@ -205,10 +208,14 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
         tasksManager.addNewTask(task3);
         tasksManager.addNewTask(task4);
 
-        String result = tasksManager.getPrioritizedTasks().toString();
-        String correctOrder = "[" + task2 + ", " + task4 + ", " + task1 + "]";
+        List<Task> prioritizedList = tasksManager.getPrioritizedTasks();
 
-        assertEquals(result, correctOrder, "Приоритет или кол-во задач не совпадает с ожидаемым.");
+        assertTrue(defaultTasksTest.equalsTask(task2, prioritizedList.get(0)),
+                "Приоритет не совпадает #1 в getPrioritizedTasks()");
+        assertTrue(defaultTasksTest.equalsTask(task4, prioritizedList.get(1)),
+                "Приоритет не совпадает #2 в getPrioritizedTasks()");
+        assertTrue(defaultTasksTest.equalsTask(task1, prioritizedList.get(2)),
+                "Приоритет не совпадает #3 в getPrioritizedTasks()");
     }
 
     @Test
@@ -230,30 +237,30 @@ class InMemoryTasksManagerTest extends TasksManagerTest<InMemoryTasksManager> {
                 LocalDateTime.of(1970, 1, 1, 0, 15)
         );
         Task task3 = new Task(
-                2,
-                "Test#2 isOverlap",
-                "Test#2 isOverlap description",
+                3,
+                "Test#3 isOverlap",
+                "Test#3 isOverlap description",
                 Status.DONE,
                 Duration.ofMinutes(15),
                 LocalDateTime.of(1970, 1, 1, 0, 30)
         );
         Task task4 = new Task(
-                2,
-                "Test#2 isOverlap",
-                "Test#2 isOverlap description",
+                4,
+                "Test#4 isOverlap",
+                "Test#4 isOverlap description",
                 Status.DONE,
                 Duration.ofMinutes(15),
-                LocalDateTime.of(1970, 1, 1, 0, 40)
+                LocalDateTime.of(1970, 1, 1, 0, 35)
         );
 
         assertDoesNotThrow(() -> tasksManager.addNewTask(task1),
-                "Добавление не пересекающихся задач привело к ошибке #1.");
+                "Добавление не пересекающихся задач привело к ошибке #1 в isOverlap()");
         assertDoesNotThrow(() -> tasksManager.addNewTask(task2),
-                "Добавление не пересекающихся задач привело к ошибке #2.");
+                "Добавление не пересекающихся задач привело к ошибке #2 в isOverlap()");
         assertDoesNotThrow(() -> tasksManager.addNewTask(task3),
-                "Добавление не пересекающихся задач привело к ошибке #3.");
+                "Добавление не пересекающихся задач привело к ошибке #3 в isOverlap()");
         assertThrows(IllegalArgumentException.class, () -> {
             tasksManager.addNewTask(task4);
-        }, "Добавление двух задач на одно время не приводит к ошибке #4.");
+        }, "Добавление двух задач на одно время не приводит к ошибке #4 в isOverlap()");
     }
 }
