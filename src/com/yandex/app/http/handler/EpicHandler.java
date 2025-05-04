@@ -2,7 +2,6 @@ package com.yandex.app.http.handler;
 
 import com.google.gson.*;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.yandex.app.manager.InMemoryTasksManager;
 import com.yandex.app.task.Epic;
 
@@ -13,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class EpicHandler extends BaseHttpHandler implements HttpHandler {
+public class EpicHandler extends BaseHttpHandler {
 
     public EpicHandler(InMemoryTasksManager manager) {
         super(manager);
@@ -85,17 +84,6 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
             } else if (pathParts.length == 3) {
                 int epicId = Integer.parseInt(pathParts[2]);
                 epic.setId(epicId);
-
-                try {
-                    manager.updateEpic(epic);
-                    sendJsonResponse(exchange,
-                            Map.of(STATUS_FIELD, TASK_UPDATED, ID_FIELD, epicId),
-                            201);
-                } catch (NoSuchElementException e) {
-                    sendNotFound(exchange);
-                } catch (IllegalArgumentException e) {
-                    sendHasInteractions(exchange);
-                }
             } else {
                 sendIncorrectMethod(exchange);
             }

@@ -1,12 +1,11 @@
 package com.yandex.app.http.handler;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.yandex.app.manager.InMemoryTasksManager;
 
 import java.io.IOException;
 
-public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
+public class HistoryHandler extends BaseHttpHandler {
     public HistoryHandler(InMemoryTasksManager manager) {
         super(manager);
     }

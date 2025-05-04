@@ -170,36 +170,6 @@ class EpicHandlerTest {
     }
 
     @Test
-    void updateEpic() throws IOException, InterruptedException {
-        Epic epic = new Epic(
-                "Тестовый эпик updateEpic()",
-                "Описание эпика updateEpic()");
-        int id = manager.addNewEpic(epic);
-
-        Epic updated = new Epic(
-                id,
-                "Обновлённый эпик updateEpic()",
-                "Обновлённое описание эпика updateEpic()");
-
-        String json = gson.toJson(updated);
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:8080/epics/" + id))
-                        .POST(HttpRequest.BodyPublishers.ofString(json))
-                        .build(),
-                HttpResponse.BodyHandlers.ofString()
-        );
-
-        assertEquals(201, response.statusCode(), "Код ответа не 201 в updateEpic()");
-        assertTrue(defaultTasksTest.equalsEpic(updated, manager.getEpic(id)),
-                "Эпики отличаются в updateEpic()");
-
-        client.close();
-    }
-
-    @Test
     void deleteEpic() throws IOException, InterruptedException {
         Epic epic = new Epic(
                 "Тестовый эпик deleteEpic()",

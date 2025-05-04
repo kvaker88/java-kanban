@@ -2,7 +2,6 @@ package com.yandex.app.http.handler;
 
 import com.google.gson.*;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.yandex.app.manager.InMemoryTasksManager;
 import com.yandex.app.task.SubTask;
 
@@ -13,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class SubTasksHandler extends BaseHttpHandler implements HttpHandler {
+public class SubTasksHandler extends BaseHttpHandler {
     public SubTasksHandler(InMemoryTasksManager manager) {
         super(manager);
     }

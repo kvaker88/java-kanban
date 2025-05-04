@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class SubTask extends Task {
-    private int epicId;
+    private final int epicId;
 
     public SubTask(
             int epicId,
@@ -82,9 +82,5 @@ public class SubTask extends Task {
                 epicId + "," +
                 startTime + "," +
                 duration + "\n";
-    }
-
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
     }
 }

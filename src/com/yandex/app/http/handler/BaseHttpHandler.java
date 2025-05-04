@@ -3,9 +3,10 @@ package com.yandex.app.http.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import com.yandex.app.http.adapter.DurationAdapter;
 import com.yandex.app.http.adapter.LocalDateTimeAdapter;
-import com.yandex.app.manager.InMemoryTasksManager;
+import com.yandex.app.manager.TasksManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class BaseHttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
 
     public static final String STATUS_FIELD = "status";
     public static final String ID_FIELD = "id";
@@ -28,10 +29,10 @@ public class BaseHttpHandler {
     public static final String INVALID_METHOD = "Использован некорректный метод при запросе";
     public static final String INCORRECT_CONTENT = "Некорректно переданы поля задачи";
 
-    protected final InMemoryTasksManager manager;
+    protected final TasksManager manager;
     protected final Gson gson;
 
-    public BaseHttpHandler(InMemoryTasksManager manager) {
+    public BaseHttpHandler(TasksManager manager) {
         this.manager = manager;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
